@@ -4,10 +4,8 @@ import Head from "next/head";
 
 export default function Home() {
   return (
-    <div className="w-full h-screen bg-red-200 flex">
-      <div className="w-3/5 bg-blue-900 p-4 hidden sm:block sm:flex sm:justify-center sm:items-center">
-        <img src="unicomer_logo_en.png" alt="" />
-      </div>
+    <div className="w-full h-screen flex">
+      
       <div className="w-full sm:w-2/5 flex justify-center items-center bg-blue-500 py-4 px-10 sm:px-15">
         <div className="w-full flex flex-col gap-6">
           <div className="sm:hidden flex justify-center items-center p-10">
@@ -45,6 +43,9 @@ export default function Home() {
             </button>
           </div>
         </div>
+      </div>
+      <div className="w-3/5 bg-blue-900 p-4 hidden sm:block sm:flex sm:justify-center sm:items-center">
+        <img src="unicomer_logo_en.png" alt="" />
       </div>
     </div>
   );
