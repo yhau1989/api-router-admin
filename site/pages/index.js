@@ -1,9 +1,21 @@
+import { useState } from 'react'
 import Head from "next/head";
 import Link from 'next/link'
+import { fetchLogin } from '../services/servicesData'; 
 // import Image from 'next/image'
 // import styles from '../styles/Home.module.css'
 
 export default function Home() {
+
+  const [ email, setEmail] = useState('');
+  const [ password, setPassword] = useState('');
+
+  const login  = () => {
+    fetchLogin(email, password).then(response => {
+      console.log('samo: ', response);
+    })
+  }
+
   return (
     <div className="w-full h-screen flex">
       
@@ -24,6 +36,7 @@ export default function Home() {
               type="email"
               autoComplete="email"
               required
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
           <div>
@@ -36,17 +49,20 @@ export default function Home() {
               id="password"
               name="password"
               placeholder="Contraseña"
+              onChange={(e) => setPassword(e.target.value)}
             />
           </div>
           <div>
-            {/* <button className="rounded-md py-2 px-4 text-white text-sm font-medium bg-blue-700 hover:bg-blue-800 w-full">
+            <button className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-700 hover:bg-blue-800"
+              onClick={() => login()}
+            >
               Ingresar
-            </button> */}
-            <Link href="/dashboard">
+            </button>
+            {/* <Link href="/dashboard">
               <a className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-700 hover:bg-blue-800">
               Ingresar
               </a>
-            </Link>
+            </Link> */}
           </div>
         </div>
       </div>

@@ -1,9 +1,9 @@
 const axios = require("axios").default;
-import { TALLERES_URL } from "../config";
+import { URLS } from "../config";
 
-export const fetchTalleresList = () => {
+export const fetchLogin = (user, password) => {
     return axios
-      .get(TALLERES_URL.URL_GET_TALLERES)
+      .post('http://10.131.10.209:7101/api/login', {user, password})
       .then((response) => {
         return {status: 0, response}
       })
