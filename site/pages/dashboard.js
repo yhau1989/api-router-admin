@@ -66,7 +66,7 @@ export default function Dashboard() {
             {/* <button className="rounded-md p-2 h-10 text-white text-sm font-semibold bg-blue-800">
               Nueva App
             </button> */}
-            <Link href="/dashboard/edit-app">
+            <Link href="/dashboard/new-app">
             <a className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-700 hover:bg-blue-800">
               Nueva App
             </a>

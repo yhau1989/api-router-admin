@@ -2,32 +2,124 @@ import { useState } from "react"
 import Image from "next/image";
 import Link from "next/link";
 import { generateApp } from "../../libs/utils";
-
+import { fetchAddApp, fetchAddEndpoint, fetchGetAppByCode } from "../../services/servicesData";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 
 
 export default function NewApp() {
 
-  const [descApp, setDescApp] = useState("");
-  const [ipApp, setIpApp] = useState("");
-  const [statusApp, setStatusApp] = useState("0");
-  const [codeApp, setCodeApp] = useState("APP20220312221223999")
+  const [codeApp] = useState(generateApp());
+  const [idApp, setIdApp] = useState(null);
 
-  const [descEndPoint, setDescEndPoint] = useState("");
-  const [pathEndPoint, setPathEndPoint] = useState("");
-  const [jsonErrorGeneralEndPoint, setJsonErrorGeneralEndPoint] = useState("");
-  const [jsonBodyEndPoint, setJsonBodyEndPoint] = useState("");
-  const [statusEndPoint, setStatusEndPoint] = useState("0");
+  const campoRequeridoMsg = "* campo requerido";
+
+  const formikApp = useFormik({
+    initialValues: {
+      nameApp: "",
+      descApp: "",
+      ipApp: "",
+      statusApp: "1",
+      codigoApp: codeApp,
+    },
+    validationSchema: Yup.object({
+      nameApp: Yup.string()
+        .required(campoRequeridoMsg),
+      descApp: Yup.string()
+        .required(campoRequeridoMsg),
+      ipApp: Yup.string()
+        .required(campoRequeridoMsg),
+    }),
+    onSubmit: (values) => {
+      const app = {
+        nombre: values.nameApp,
+        descripcion: values.descApp,
+        codigo: values.codigoApp,
+        dnsIpDestino: values.ipApp
+      };
+
+      fetchAddApp(app).then(rsp => {
+        const { data, request, status } = rsp.response;
+        if(status == 200 && data.status == 0){
+          fetchGetAppByCode(values.codigoApp).then( xresp => {
+            const { data, request, status } = xresp.response;
+            if(status == 200 && data.status == 0){
+              alert('App agregada con exito')
+              setIdApp(data.data);
+            }
+            else
+            {
+              console.log('fetchGetAppByCode error:', xresp.response);
+            }
+          });
+        } else {
+          alert(data.msg)
+        }
+      });
+    },
+  });
+
+  const formikEndPoints = useFormik({
+    initialValues: {
+      codeApp: idApp?.id,
+      descEndPoint: "",
+      pathEndPoint: "",
+      jsonErrorGeneralEndPoint: "",
+      jsonBodyEndPoint: "",
+      statusEndPoint: "1",
+      metodoRest: "POST",
+    },
+    validationSchema: Yup.object({
+      descEndPoint: Yup.string()
+        .required(campoRequeridoMsg),
+      pathEndPoint: Yup.string()
+        .required(campoRequeridoMsg),
+    }),
+    onSubmit: (values) => {
+      if(idApp?.id)
+      {
+        const endPoint = {
+          p_aplicacion: idApp.id,
+          p_path: values.pathEndPoint,
+          p_descripcion: values.descEndPoint,
+          p_jsonRequest: values.jsonBodyEndPoint,
+          p_jsonResponseErrorDefault: values.jsonErrorGeneralEndPoint,
+          p_metodoRestApi: values.metodoRest,
+          p_estado: values.statusEndPoint
+        };
+        
+        fetchAddEndpoint(endPoint).then(rsp => {
+           console.log(rsp);
+           const { data, request, status } = rsp.response;
+           if(status == 200 && data.status == 0){
+              alert('Enpoint agregado con correctamente')
+           } else {
+              alert(data.msg)
+           }
+        });
+        
+      }
+      else
+      {
+        alert('Primero debe agregar un app')
+      }
+      
+
+      // fetchAddEndpoint(endPoint).then(rsp => {
+      //   console.log(rsp);
+      //   const { data, request, status } = rsp.response;
+      //   if(status == 200 && data.status == 0){
+      //     alert('Enpoint agregado con correctamente')
+      //   } else {
+      //     alert(data.msg)
+      //   }
+      // });
+
+    },
+  });
 
 
-  const handleSaveApp = () => {
-    alert('sadd')
 
-  }
-
-  const handleAddEndpoint = () => {
-    alert('sadd')
-    
-  }
 
 
   return (
@@ -55,10 +147,10 @@ export default function NewApp() {
       </nav>
       <main className="bg-slate-100 pb-20">
         <section className="my-10 p-4 flex flex-col md:flex-row gap-10">
-          <div className="w-full md:w-2/5 ">
+          <form id="form1" onSubmit={formikApp.handleSubmit} className="w-full md:w-2/5 ">
             <div>
               <h1 className="text-gray-900 text-3xl font-extrabold tracking-tight">
-                Datos del app: {generateApp()}
+                Datos del app: {codeApp}
               </h1>
               <h5 className=" text-slate-500 text-sm">
                 Ingresar principales datos del app.
@@ -67,7 +159,34 @@ export default function NewApp() {
             <div className="p-4 mt-4 rounded-md bg-white w-full flex flex-col gap-3">
               <div>
                 <label
-                  htmlFor="descripcion-app"
+                  htmlFor="descApp"
+                  className="text-slate-900 text-sm flex items-center"
+                >
+                  Nombre <span className="text-red-400 mx-2">*</span>
+                </label>
+                <input
+                  className="bg-white w-full py-2 px-3 border border-gray-300 rounded-md text-sm"
+                  type="text"
+                  id="nameApp"
+                  name="nameApp"
+                  placeholder="Nombre"
+                  onBlur={formikApp.handleBlur}
+                  onChange={formikApp.handleChange}
+                  value={formikApp.values.nameApp}
+                />
+                <div>
+                  {
+                    formikApp.touched.nameApp && formikApp.errors.nameApp ? (
+                      <span className="text-xs text-red-500">
+                        {formikApp.errors.nameApp}
+                      </span>
+                    ) : null
+                  }
+                </div>
+              </div>
+              <div>
+                <label
+                  htmlFor="descApp"
                   className="text-slate-900 text-sm flex items-center"
                 >
                   Descripción <span className="text-red-400 mx-2">*</span>
@@ -75,16 +194,26 @@ export default function NewApp() {
                 <input
                   className="bg-white w-full py-2 px-3 border border-gray-300 rounded-md text-sm"
                   type="text"
-                  id="descripcion-app"
-                  name="descripción-app"
+                  id="descApp"
+                  name="descApp"
                   placeholder="Descripción"
-                  value={descApp}
-                  onChange={e => setDescApp(e.target.va)}
+                  onBlur={formikApp.handleBlur}
+                  onChange={formikApp.handleChange}
+                  value={formikApp.values.descApp}
                 />
+                <div>
+                  {
+                    formikApp.touched.descApp && formikApp.errors.descApp ? (
+                      <span className="text-xs text-red-500">
+                        {formikApp.errors.descApp}
+                      </span>
+                    ) : null
+                  }
+                </div>
               </div>
               <div>
                 <label
-                  htmlFor="email-address"
+                  htmlFor="ipApp"
                   className="text-slate-900 text-sm flex items-center"
                 >
                   Dns / Ip destino <span className="text-red-400 mx-2">*</span>
@@ -92,12 +221,22 @@ export default function NewApp() {
                 <input
                   className="bg-white w-full py-2 px-3 border border-gray-300 rounded-md text-sm"
                   type="text"
-                  id="dnp-ip"
-                  name="dnp-ip"
+                  id="ipApp"
+                  name="ipApp"
                   placeholder="Dns / Ip destino"
-                  value={ipApp}
-                  onChange={e => setIpApp(e.target.va)}
+                  onBlur={formikApp.handleBlur}
+                  onChange={formikApp.handleChange}
+                  value={formikApp.values.ipApp}
                 />
+                <div>
+                  {
+                    formikApp.touched.ipApp && formikApp.errors.ipApp ? (
+                      <span className="text-xs text-red-500">
+                        {formikApp.errors.ipApp}
+                      </span>
+                    ) : null
+                  }
+                </div>
               </div>
               <div>
                 <label
@@ -111,7 +250,9 @@ export default function NewApp() {
                   name="country"
                   autoComplete="country-name"
                   className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-                  onChange={(e) => setStatusApp(e.target.value)}
+                  onBlur={formikApp.handleBlur}
+                  onChange={formikApp.handleChange}
+                  value={formikApp.values.statusApp}
                 >
                   <option value="1">Activo</option>
                   <option value="0">Inactivo</option>
@@ -119,14 +260,14 @@ export default function NewApp() {
               </div>
               <div>
                 <button className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-700 hover:bg-blue-800"
-                onClick={() => handleSaveApp()}
+                type="submit"
                 >
                   Guardar
                 </button>
               </div>
             </div>
-          </div>
-          <div className="w-full md:w-3/5">
+          </form>
+          <form id="form2" onSubmit={formikEndPoints.handleSubmit} className="w-full md:w-3/5">
             <div>
               <h1 className="text-gray-900 text-3xl font-extrabold tracking-tight">
                 Datalle del endpoint
@@ -140,7 +281,7 @@ export default function NewApp() {
                 <div className="w-full flex flex-col gap-3">
                   <div>
                     <label
-                      htmlFor="descripcion-endpoint"
+                      htmlFor="descEndPoint"
                       className="text-slate-900 text-sm flex items-center"
                     >
                       Descripción <span className="text-red-400 mx-2">*</span>
@@ -148,14 +289,26 @@ export default function NewApp() {
                     <input
                       className="bg-white w-full py-2 px-3 border border-gray-300 rounded-md text-sm"
                       type="text"
-                      id="descripcion-endpoint"
-                      name="descripción-endpoint"
+                      id="descEndPoint"
+                      name="descEndPoint"
                       placeholder="Descripción"
+                      onBlur={formikEndPoints.handleBlur}
+                      onChange={formikEndPoints.handleChange}
+                      value={formikEndPoints.values.descEndPoint}
                     />
+                    <div>
+                  {
+                    formikEndPoints.touched.descEndPoint && formikEndPoints.errors.descEndPoint ? (
+                      <span className="text-xs text-red-500">
+                        {formikEndPoints.errors.descEndPoint}
+                      </span>
+                    ) : null
+                  }
+                </div>
                   </div>
                   <div>
                     <label
-                      htmlFor="enpoint-path"
+                      htmlFor="pathEndPoint"
                       className="text-slate-900 text-sm flex items-center"
                     >
                       Path <span className="text-red-400 mx-2">*</span>
@@ -163,23 +316,35 @@ export default function NewApp() {
                     <input
                       className="bg-white w-full py-2 px-3 border border-gray-300 rounded-md text-sm"
                       type="text"
-                      id="enpoint-path"
-                      name="enpoint-path"
+                      id="pathEndPoint"
+                      name="pathEndPoint"
                       placeholder="Path"
+                      onBlur={formikEndPoints.handleBlur}
+                      onChange={formikEndPoints.handleChange}
+                      value={formikEndPoints.values.pathEndPoint}
                     />
+                    {
+                    formikEndPoints.touched.pathEndPoint && formikEndPoints.errors.pathEndPoint ? (
+                      <span className="text-xs text-red-500">
+                        {formikEndPoints.errors.pathEndPoint}
+                      </span>
+                    ) : null
+                  }
                   </div>
                   <div>
                     <label
-                      htmlFor="enpoint-status"
+                      htmlFor="statusEndPoint"
                       className="text-slate-900 text-sm flex items-center"
                     >
                       Estado <span className="text-red-400 mx-2">*</span>
                     </label>
                     <select
-                      id="enpoint-status"
-                      name="enpoint-status"
+                      id="statusEndPoint"
+                      name="statusEndPoint"
                       className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-                      onChange={(e) => setStatusEndPoint(e.target.value)}
+                      onBlur={formikEndPoints.handleBlur}
+                      onChange={formikEndPoints.handleChange}
+                      value={formikEndPoints.values.statusEndPoint}
                     >
                       <option value="1">Activo</option>
                       <option value="0">Inactivo</option>
@@ -189,7 +354,7 @@ export default function NewApp() {
                 <div className="w-full flex flex-col gap-3">
                   <div>
                     <label
-                      htmlFor="enpoint-json-error"
+                      htmlFor="jsonErrorGeneralEndPoint"
                       className="text-slate-900 text-sm flex items-center"
                     >
                       Json error general
@@ -197,14 +362,17 @@ export default function NewApp() {
                     <input
                       className="bg-white w-full py-2 px-3 border border-gray-300 rounded-md text-sm"
                       type="text"
-                      id="enpoint-json-error"
-                      name="enpoint-json-error"
+                      id="jsonErrorGeneralEndPoint"
+                      name="jsonErrorGeneralEndPoint"
                       placeholder="Json error general"
+                      onBlur={formikEndPoints.handleBlur}
+                      onChange={formikEndPoints.handleChange}
+                      value={formikEndPoints.values.jsonErrorGeneralEndPoint}
                     />
                   </div>
                   <div>
                     <label
-                      htmlFor="enpoint-json-body"
+                      htmlFor="jsonBodyEndPoint"
                       className="text-slate-900 text-sm flex items-center"
                     >
                       Json boby request (ejemplo)
@@ -212,23 +380,53 @@ export default function NewApp() {
                     <input
                       className="bg-white w-full py-2 px-3 border border-gray-300 rounded-md text-sm"
                       type="text"
-                      id="enpoint-json-body"
-                      name="enpoint-json-body"
+                      id="jsonBodyEndPoint"
+                      name="jsonBodyEndPoint"
                       placeholder="Json boby request"
+                      onBlur={formikEndPoints.handleBlur}
+                      onChange={formikEndPoints.handleChange}
+                      value={formikEndPoints.values.jsonBodyEndPoint}
                     />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="metodoRest"
+                      className="text-slate-900 text-sm flex items-center"
+                    >
+                      Tipo método <span className="text-red-400 mx-2">*</span>
+                    </label>
+                    <select
+                      id="metodoRest"
+                      name="metodoRest"
+                      className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                      onBlur={formikEndPoints.handleBlur}
+                      onChange={formikEndPoints.handleChange}
+                      value={formikEndPoints.values.metodoRest}
+                    >
+                      <option value="POST">POST</option>
+                      <option value="GET">GET</option>
+                      <option value="DELETE">DELETE</option>
+                      <option value="HEAD">HEAD</option>
+                      <option value="PUT">PUT</option>
+                      <option value="PATCH">PATCH</option>
+                      <option value="OPTION">OPTIONS</option>
+                      <option value="TRACE">TRACE</option>
+                    </select>
                   </div>
                 </div>
               </div>
 
               <div className=" w-full flex flex-row gap-4">
                 <div>
-                  <button className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-700 hover:bg-blue-800">
+                  <button className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-700 hover:bg-blue-800"
+                  type="submit"
+                  >
                     Agregar
                   </button>
                 </div>
               </div>
             </div>
-          </div>
+          </form>
         </section>
         <section className="mt-10 p-4">
           <div className="flex justify-between items-center">

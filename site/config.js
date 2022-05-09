@@ -5,4 +5,8 @@ export const URLS = {
     URL_LOGIN: `${API_URL}/api/login`,
     URL_GET_ALL_APPS: `${API_URL}/api/allappactives`,
     URL_GET_ALL_ENDPOINTS: `${API_URL}/api/allaendpoints`,
+    URL_ADD_APPS: `${API_URL}/api/addapp`,
+    URL_ADD_ENDPOINTS: `${API_URL}/api/addendpoint`,
+    URL_GET_APP: `${API_URL}/api/appbycode`,
+    
 };
