@@ -1,29 +1,82 @@
 import { useState, useEffect } from "react"
+import { useRouter } from "next/router";
 import Image from "next/image";
 import Link from "next/link";
-import { generateApp } from "../../libs/utils";
-import { fetchAddApp, fetchAddEndpoint, fetchGetAppByCode, fetchGetEndPointsByIdApp, fetchDeleteEndPoint } from "../../services/servicesData";
+import { fetchAddApp, fetchAddEndpoint, fetchGetAppByCode, fetchGetEndPointsByIdApp, fetchDeleteEndPoint } from "../../../services/servicesData";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 
 
-export default function NewApp() {
+export default function EditApp() {
 
-  const [codeApp] = useState(generateApp());
-  const [idApp, setIdApp] = useState(null);
+  const router = useRouter();
+  const { id } = router.query;
+  const [app, setApp] = useState(null);
   const [endpoints, setEndPoints] = useState([]);
   const [actualizaListEndpoints, setActualizaListEndpoints] = useState(false);
+  const [initVal, setInitVal] = useState({
+    nameApp: "",
+    descApp: "",
+    ipApp: "",
+    statusApp: "1",
+    codigoApp: "",
+  });
 
   const campoRequeridoMsg = "* campo requerido";
 
+  
+  useEffect(() => {
+    console.log('id', id);
+    const initApp = () => {
+      if(id)
+      {
+          fetchGetAppByCode(id).then( xresp => {
+            const { data, request, status } = xresp.response;
+            if(status == 200 && data.status == 0){
+                console.log('app', data.data);
+                setInitVal({
+                    nameApp: data.data.nombre,
+                    descApp: data.data.descripcion,
+                    ipApp: data.data.id.toString(),
+                    statusApp: data.data.estado.toString(),
+                    codigoApp: data.data.codigo,
+                  })
+                getEndPoints(data.data);
+                 setApp(data.data);
+            }
+            else
+            {
+              console.log('fetchGetAppByCode error:', xresp.response);
+            }
+          });
+      }
+    };
+  
+   
+    const getEndPoints = (app) => {
+      if(app)
+      {
+        fetchGetEndPointsByIdApp(app.id).then(rsp => {
+          const { data, request, status } = rsp.response;
+          if(status == 200 && data.status == 0){
+            console.log('fetchGetEndPointsByIdApp', data.data);
+            setEndPoints([...data.data]);
+          }
+          else
+          {
+            setEndPoints([]);
+            console.log('fetchGetEndPointsByIdApp error:', rsp.response);
+          }
+        });
+      }
+    };
+
+    initApp();
+    
+},[id]);
+
   const formikApp = useFormik({
-    initialValues: {
-      nameApp: "",
-      descApp: "",
-      ipApp: "",
-      statusApp: "1",
-      codigoApp: codeApp,
-    },
+    initialValues: initVal,
     validationSchema: Yup.object({
       nameApp: Yup.string()
         .required(campoRequeridoMsg),
@@ -40,30 +93,20 @@ export default function NewApp() {
         dnsIpDestino: values.ipApp
       };
 
-      fetchAddApp(app).then(rsp => {
-        const { data, request, status } = rsp.response;
-        if(status == 200 && data.status == 0){
-          fetchGetAppByCode(values.codigoApp).then( xresp => {
-            const { data, request, status } = xresp.response;
-            if(status == 200 && data.status == 0){
-              alert('App agregada con exito')
-              setIdApp(data.data);
-            }
-            else
-            {
-              console.log('fetchGetAppByCode error:', xresp.response);
-            }
-          });
-        } else {
-          alert(data.msg)
-        }
-      });
+    //   fetchAddApp(app).then(rsp => {
+    //     const { data, request, status } = rsp.response;
+    //     if(status == 200 && data.status == 0){
+          
+    //     } else {
+    //       alert(data.msg)
+    //     }
+    //   });
     },
   });
 
   const formikEndPoints = useFormik({
     initialValues: {
-      codeApp: idApp?.id,
+      codeApp: id,
       descEndPoint: "",
       pathEndPoint: "",
       jsonErrorGeneralEndPoint: "",
@@ -78,10 +121,10 @@ export default function NewApp() {
         .required(campoRequeridoMsg),
     }),
     onSubmit: (values) => {
-      if(idApp?.id)
+      if(id)
       {
         const endPoint = {
-          p_aplicacion: idApp.id,
+          p_aplicacion: app.id,
           p_path: values.pathEndPoint,
           p_descripcion: values.descEndPoint,
           p_jsonRequest: values.jsonBodyEndPoint,
@@ -110,29 +153,29 @@ export default function NewApp() {
   });
 
 
-  useEffect(() => {
-    const getEndPoints = () => {
-      console.log('idApp', idApp);
-      if(idApp)
-      {
-        fetchGetEndPointsByIdApp(idApp.id).then(rsp => {
-          const { data, request, status } = rsp.response;
-          if(status == 200 && data.status == 0){
-            console.log('fetchGetEndPointsByIdApp', data.data);
-            setEndPoints([...data.data]);
-          }
-          else
-          {
-            setEndPoints([]);
-            console.log('fetchGetEndPointsByIdApp error:', rsp.response);
-          }
-        });
-      }
-    };
+//   useEffect(() => {
+//     const getEndPoints = () => {
+//       if(app)
+//       {
+//         fetchGetEndPointsByIdApp(app.id).then(rsp => {
+//           const { data, request, status } = rsp.response;
+//           if(status == 200 && data.status == 0){
+//             console.log('fetchGetEndPointsByIdApp', data.data);
+//             setEndPoints([...data.data]);
+//           }
+//           else
+//           {
+//             setEndPoints([]);
+//             console.log('fetchGetEndPointsByIdApp error:', rsp.response);
+//           }
+//         });
+//       }
+//     };
 
-    getEndPoints();
+//     getEndPoints();
 
-  },[actualizaListEndpoints]);
+//   },[actualizaListEndpoints]);
+
 
   const handleDeleteEndPoint = (id) => {
     alert('Enpoint eliminado correctamente');
@@ -164,10 +207,10 @@ export default function NewApp() {
       </nav>
       <main className="bg-slate-100 pb-20">
         <section className="my-10 p-4 flex flex-col md:flex-row gap-10">
-          <form id="form1" onSubmit={formikApp.handleSubmit} className="w-full md:w-2/5 ">
+          <form id="form1" enableReinitialize={true} onSubmit={formikApp.handleSubmit} className="w-full md:w-2/5 ">
             <div>
               <h1 className="text-gray-900 text-3xl font-extrabold tracking-tight">
-                Datos del app: {codeApp}
+                Datos del app: {id}
               </h1>
               <h5 className=" text-slate-500 text-sm">
                 Ingresar principales datos del app.

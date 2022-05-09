@@ -7,6 +7,7 @@ import { fetGetAllApps, fetGetAllEndPoints } from '../services/servicesData';
 
 export default function Dashboard() {
 
+  const router = useRouter();
   const [totalsApps, setTotalsApps] = useState([]);
   const [totalsEndPoints, setTotalsEndPoints] = useState(0);
 
@@ -87,7 +88,13 @@ export default function Dashboard() {
                   <div className="w-full">{items.codigo}</div>
                   <div className="w-full">{items.descripcion}</div>
                   <div className="w-full">{items.dnsIpDestino}</div>
-                  <div className="w-full text-center">Acciones</div>
+                  <div className="w-full text-center">
+                    <button className="bg-blue-700 hover:bg-blue-800 text-white p-2 font-semibold text-xs rounded-md"
+                    onClick={() => router.push(`/app/edit/${items.codigo}`)}
+                    >
+                      Editar
+                    </button>
+                  </div>
                 </div>)
               }
           </div>

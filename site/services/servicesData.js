@@ -66,3 +66,27 @@ export const fetchLogin = (user, password) => {
         return {status: 99, error}
       });
   };
+
+  export const fetchGetEndPointsByIdApp = (idApp) => {
+    return axios
+      .get(`${URLS.URL_GET_ENDPOINTS_BY_ID_APP}?idApp=${idApp}`)
+      .then((response) => {
+        return {status: 0, response}
+      })
+      .catch((error) => {
+        return {status: 99, error}
+      });
+  };
+
+  export const fetchDeleteEndPoint = (id) => {
+    return axios
+      .delete(`${URLS.URL_REMOVE_ENDPOINT}?id=${id}`)
+      .then((response) => {
+        return {status: 0, response}
+      })
+      .catch((error) => {
+        return {status: 99, error}
+      });
+  };
+
+  
