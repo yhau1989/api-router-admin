@@ -1,9 +1,40 @@
-import Head from "next/head";
+import { useEffect, useState} from 'react'
 import Link from 'next/link'
 import Narvar from '../components/Narvar'
-// import styles from '../styles/Home.module.css'
+import { parseCookies } from "../libs/parseCookies"
+import { useRouter } from 'next/router'
+import { fetGetAllApps, fetGetAllEndPoints } from '../services/servicesData'; 
 
 export default function Dashboard() {
+
+  const [totalsApps, setTotalsApps] = useState([]);
+  const [totalsEndPoints, setTotalsEndPoints] = useState(0);
+
+  useEffect(() => {
+    const getData = () => {
+      Promise.all([fetGetAllApps().then(rsp => rsp), fetGetAllEndPoints().then(rsp => rsp)])
+      .then(rsp => {
+        rsp.forEach(element => {
+          const { data, request, status } = element.response;
+          if(status == 200){
+            if(request.responseURL.includes("allappactives")){
+              setTotalsApps(data.data);
+            } else {
+              setTotalsEndPoints(data.data.length);
+            }
+          } else {
+            console.log('error: ', data.msg);
+          }
+        });
+      });
+    }
+
+    getData();
+
+
+  }, []);
+  
+
   return (
     <div className="w-full h-screen bg-slate-100">
       <Narvar />
@@ -12,13 +43,13 @@ export default function Dashboard() {
           <div className="shadow-md rounded-md p-4 w-32 flex flex-col gap-4 justify-center items-center text-slate-500 bg-white">
             Apps
             <h1 className="text-gray-900 text-3xl font-extrabold tracking-tight">
-              200
+              { totalsApps.length }
             </h1>
           </div>
           <div className="shadow-md rounded-md p-4 w-32 flex flex-col gap-4 justify-center items-center text-slate-500 bg-white">
             Endpoints
             <h1 className="text-gray-900 text-3xl font-extrabold tracking-tight">
-              200
+              { totalsEndPoints }
             </h1>
           </div>
         </section>
@@ -51,27 +82,15 @@ export default function Dashboard() {
                 <div className="w-full">Dns / IP Destino</div>
                 <div className="w-full text-center">Acciones</div>
               </div>
-              <div className="p-2 flex justify-between items-center border-t text-slate-500">
-                <div className="w-full">APP-001</div>
-                <div className="w-full">Api Rputer</div>
-                <div className="w-full">https://unicomer.apirouter.com-ec</div>
-                <div className="w-full text-center">
-                  <button className="text-blue-800 font-semibold">Administrar</button>
-                </div>
-              </div>
-              <div className="p-2 flex justify-between items-center border-t text-slate-500">
-                <div className="w-full">APP-001</div>
-                <div className="w-full">Api Rputer</div>
-                <div className="w-full">https://unicomer.apirouter.com-ec</div>
-                <div className="w-full text-center">
-                  <button className="text-blue-800 font-semibold">Administrar</button>
-                </div>
-              </div>
+              {
+                totalsApps.map(items => <div key={items.id} className="p-2 flex justify-between items-center border-t text-slate-500">
+                  <div className="w-full">{items.codigo}</div>
+                  <div className="w-full">{items.descripcion}</div>
+                  <div className="w-full">{items.dnsIpDestino}</div>
+                  <div className="w-full text-center">Acciones</div>
+                </div>)
+              }
           </div>
-
-
-
-          
         </section>
       </main>
     </div>

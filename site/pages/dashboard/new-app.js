@@ -1,9 +1,8 @@
-import Head from "next/head";
 import Image from "next/image";
 import Link from 'next/link'
 // import styles from '../styles/Home.module.css'
 
-export default function EditApp() {
+export default function NewApp() {
   return (
     <div className="w-full h-screen bg-slate-100">
       <nav className="w-full flex p-4 items-center bg-white">
@@ -193,7 +192,7 @@ export default function EditApp() {
               <div className=" w-full flex flex-row gap-4">
                 <div>
                   <button className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-700 hover:bg-blue-800">
-                    Agregar / Guardar
+                    Agregar
                   </button>
                 </div>
               </div>
