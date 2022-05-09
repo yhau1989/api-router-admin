@@ -1,8 +1,35 @@
+import { useState } from "react"
 import Image from "next/image";
-import Link from 'next/link'
-// import styles from '../styles/Home.module.css'
+import Link from "next/link";
+import { generateApp } from "../../libs/utils";
+
+
 
 export default function NewApp() {
+
+  const [descApp, setDescApp] = useState("");
+  const [ipApp, setIpApp] = useState("");
+  const [statusApp, setStatusApp] = useState("0");
+  const [codeApp, setCodeApp] = useState("APP20220312221223999")
+
+  const [descEndPoint, setDescEndPoint] = useState("");
+  const [pathEndPoint, setPathEndPoint] = useState("");
+  const [jsonErrorGeneralEndPoint, setJsonErrorGeneralEndPoint] = useState("");
+  const [jsonBodyEndPoint, setJsonBodyEndPoint] = useState("");
+  const [statusEndPoint, setStatusEndPoint] = useState("0");
+
+
+  const handleSaveApp = () => {
+    alert('sadd')
+
+  }
+
+  const handleAddEndpoint = () => {
+    alert('sadd')
+    
+  }
+
+
   return (
     <div className="w-full h-screen bg-slate-100">
       <nav className="w-full flex p-4 items-center bg-white">
@@ -16,14 +43,10 @@ export default function NewApp() {
             />
           </div>
           <Link href="/dashboard">
-            <a className="text-blue-800 font-semibold">
-              Inicio
-            </a>
+            <a className="text-blue-800 font-semibold">Inicio</a>
           </Link>
           <Link href="#">
-            <a className="text-blue-800 font-semibold">
-              Logs
-            </a>
+            <a className="text-blue-800 font-semibold">Logs</a>
           </Link>
         </div>
         <button className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-700 hover:bg-blue-800">
@@ -35,7 +58,7 @@ export default function NewApp() {
           <div className="w-full md:w-2/5 ">
             <div>
               <h1 className="text-gray-900 text-3xl font-extrabold tracking-tight">
-                Datos del app
+                Datos del app: {generateApp()}
               </h1>
               <h5 className=" text-slate-500 text-sm">
                 Ingresar principales datos del app.
@@ -55,6 +78,8 @@ export default function NewApp() {
                   id="descripcion-app"
                   name="descripción-app"
                   placeholder="Descripción"
+                  value={descApp}
+                  onChange={e => setDescApp(e.target.va)}
                 />
               </div>
               <div>
@@ -70,6 +95,8 @@ export default function NewApp() {
                   id="dnp-ip"
                   name="dnp-ip"
                   placeholder="Dns / Ip destino"
+                  value={ipApp}
+                  onChange={e => setIpApp(e.target.va)}
                 />
               </div>
               <div>
@@ -84,13 +111,16 @@ export default function NewApp() {
                   name="country"
                   autoComplete="country-name"
                   className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                  onChange={(e) => setStatusApp(e.target.value)}
                 >
-                  <option>Activo</option>
-                  <option>Inactivo</option>
+                  <option value="1">Activo</option>
+                  <option value="0">Inactivo</option>
                 </select>
               </div>
               <div>
-                <button className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-700 hover:bg-blue-800">
+                <button className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-700 hover:bg-blue-800"
+                onClick={() => handleSaveApp()}
+                >
                   Guardar
                 </button>
               </div>
@@ -149,9 +179,10 @@ export default function NewApp() {
                       id="enpoint-status"
                       name="enpoint-status"
                       className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                      onChange={(e) => setStatusEndPoint(e.target.value)}
                     >
-                      <option>Activo</option>
-                      <option>Inactivo</option>
+                      <option value="1">Activo</option>
+                      <option value="0">Inactivo</option>
                     </select>
                   </div>
                 </div>
@@ -160,7 +191,7 @@ export default function NewApp() {
                     <label
                       htmlFor="enpoint-json-error"
                       className="text-slate-900 text-sm flex items-center"
-                    > 
+                    >
                       Json error general
                     </label>
                     <input

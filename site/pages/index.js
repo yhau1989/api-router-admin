@@ -18,7 +18,7 @@ export default function Home({ data }) {
 
   const login  = () => {
     fetchLogin(email, password).then(rsp => {
-      const { status, response } = rsp;
+      const { status, response, error } = rsp;
       if(status == 0 && response.data.status == 0)
       {
         setCookie("userLogin", 'ok', {
@@ -31,7 +31,7 @@ export default function Home({ data }) {
       else
       {
         console.log('samo: ', rsp);
-        setError(response.data.msg);
+        setError(error.message);
       }
 
     })
