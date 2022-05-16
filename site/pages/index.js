@@ -31,7 +31,7 @@ export default function Home({ data }) {
       else
       {
         console.log('samo: ', rsp);
-        setError(error.message);
+        setError(response.data.msg);
       }
 
     })

@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import Image from "next/image";
 import Link from "next/link";
 import { fetchAddApp, fetchAddEndpoint, fetchGetAppByCode, fetchGetEndPointsByIdApp, fetchDeleteEndPoint } from "../../../services/servicesData";
-import { useFormik } from "formik";
+import { Formik } from "formik";
 import * as Yup from "yup";
 
 
@@ -22,9 +22,17 @@ export default function EditApp() {
     codigoApp: "",
   });
 
+  const [codeApp, setCodeApp] = useState("");
+  const [descEndPoint, setDescEndPoint] = useState("");
+  const [pathEndPoint, setPathEndPoint] = useState("");
+  const [jsonErrorGeneralEndPoint, setJsonErrorGeneralEndPoint] = useState("");
+  const [jsonBodyEndPoint, setJsonBodyEndPoint] = useState("");
+  const [statusEndPoint, setStatusEndPoint] = useState("1");
+  const [metodoRest, setMetodoRest] = useState("POST");
+
+  const [actionsEndPoint, setActionsEndPoint] = useState("add");
   const campoRequeridoMsg = "* campo requerido";
 
-  
   useEffect(() => {
     console.log('id', id);
     const initApp = () => {
@@ -37,12 +45,12 @@ export default function EditApp() {
                 setInitVal({
                     nameApp: data.data.nombre,
                     descApp: data.data.descripcion,
-                    ipApp: data.data.id.toString(),
+                    ipApp: data.data.dnsIpDestino.toString(),
                     statusApp: data.data.estado.toString(),
                     codigoApp: data.data.codigo,
                   })
                 getEndPoints(data.data);
-                 setApp(data.data);
+                setApp(data.data);
             }
             else
             {
@@ -70,116 +78,43 @@ export default function EditApp() {
         });
       }
     };
-
     initApp();
-    
-},[id]);
-
-  const formikApp = useFormik({
-    initialValues: initVal,
-    validationSchema: Yup.object({
-      nameApp: Yup.string()
-        .required(campoRequeridoMsg),
-      descApp: Yup.string()
-        .required(campoRequeridoMsg),
-      ipApp: Yup.string()
-        .required(campoRequeridoMsg),
-    }),
-    onSubmit: (values) => {
-      const app = {
-        nombre: values.nameApp,
-        descripcion: values.descApp,
-        codigo: values.codigoApp,
-        dnsIpDestino: values.ipApp
-      };
-
-    //   fetchAddApp(app).then(rsp => {
-    //     const { data, request, status } = rsp.response;
-    //     if(status == 200 && data.status == 0){
-          
-    //     } else {
-    //       alert(data.msg)
-    //     }
-    //   });
-    },
-  });
-
-  const formikEndPoints = useFormik({
-    initialValues: {
-      codeApp: id,
-      descEndPoint: "",
-      pathEndPoint: "",
-      jsonErrorGeneralEndPoint: "",
-      jsonBodyEndPoint: "",
-      statusEndPoint: "1",
-      metodoRest: "POST",
-    },
-    validationSchema: Yup.object({
-      descEndPoint: Yup.string()
-        .required(campoRequeridoMsg),
-      pathEndPoint: Yup.string()
-        .required(campoRequeridoMsg),
-    }),
-    onSubmit: (values) => {
-      if(id)
-      {
-        const endPoint = {
-          p_aplicacion: app.id,
-          p_path: values.pathEndPoint,
-          p_descripcion: values.descEndPoint,
-          p_jsonRequest: values.jsonBodyEndPoint,
-          p_jsonResponseErrorDefault: values.jsonErrorGeneralEndPoint,
-          p_metodoRestApi: values.metodoRest,
-          p_estado: values.statusEndPoint
-        };
-
-        fetchAddEndpoint(endPoint).then(rsp => {
-           const { data, request, status } = rsp.response;
-           if(status == 200 && data.status == 0){
-              alert('Enpoint agregado con correctamente')
-              setActualizaListEndpoints(!actualizaListEndpoints);
-           } else {
-              alert(data.msg)
-           }
-        });
-        
-      }
-      else
-      {
-        alert('Primero debe agregar un app')
-      }
-      
-    },
-  });
-
-
-//   useEffect(() => {
-//     const getEndPoints = () => {
-//       if(app)
-//       {
-//         fetchGetEndPointsByIdApp(app.id).then(rsp => {
-//           const { data, request, status } = rsp.response;
-//           if(status == 200 && data.status == 0){
-//             console.log('fetchGetEndPointsByIdApp', data.data);
-//             setEndPoints([...data.data]);
-//           }
-//           else
-//           {
-//             setEndPoints([]);
-//             console.log('fetchGetEndPointsByIdApp error:', rsp.response);
-//           }
-//         });
-//       }
-//     };
-
-//     getEndPoints();
-
-//   },[actualizaListEndpoints]);
-
+  },[id]);
 
   const handleDeleteEndPoint = (id) => {
-    alert('Enpoint eliminado correctamente');
-    fetchDeleteEndPoint(id).then(setActualizaListEndpoints(!actualizaListEndpoints));
+    
+    fetchDeleteEndPoint(id).then(rsp => {
+      console.log('rsp: ', rsp);
+      alert('Enpoint eliminado correctamente');
+      // setActualizaListEndpoints(!actualizaListEndpoints)
+    });
+  };
+
+  const handleEdit = (data) => {
+    console.log("handleEdit: ", data);
+    setActionsEndPoint("edit");
+    setCodeApp(app.id);
+    setDescEndPoint(data.descripcion);
+    setPathEndPoint(data.path);
+    setJsonErrorGeneralEndPoint(data.jsonResponseErrorDefault?.length > 0 ? data.jsonResponseErrorDefault : "");
+    setJsonBodyEndPoint(data.jsonRequest?.length > 0 ? data.jsonRequest : "");
+    setStatusEndPoint( data.estado);
+    setMetodoRest(data.metodoRestApi);
+  };
+
+  const handleCancel = () => {
+    setActionsEndPoint("add");
+    setCodeApp(app.id);
+    setDescEndPoint("");
+    setPathEndPoint("");
+    setJsonErrorGeneralEndPoint("");
+    setJsonBodyEndPoint("");
+    setStatusEndPoint("1");
+    setMetodoRest("POST");
+  };
+
+  const handleSubmitEndPoint = () => {
+
   };
 
   return (
@@ -207,286 +142,316 @@ export default function EditApp() {
       </nav>
       <main className="bg-slate-100 pb-20">
         <section className="my-10 p-4 flex flex-col md:flex-row gap-10">
-          <form id="form1" enableReinitialize={true} onSubmit={formikApp.handleSubmit} className="w-full md:w-2/5 ">
-            <div>
-              <h1 className="text-gray-900 text-3xl font-extrabold tracking-tight">
-                Datos del app: {id}
-              </h1>
-              <h5 className=" text-slate-500 text-sm">
-                Ingresar principales datos del app.
-              </h5>
-            </div>
-            <div className="p-4 mt-4 rounded-md bg-white w-full flex flex-col gap-3">
+        {
+          initVal.nameApp.length > 0 ? (
+          <Formik
+            initialValues={initVal}
+            validationSchema= {Yup.object({
+              nameApp: Yup.string().required(campoRequeridoMsg),
+              descApp: Yup.string().required(campoRequeridoMsg),
+              ipApp: Yup.string().required(campoRequeridoMsg),
+            })}
+            onSubmit= {values => {
+              const app = {
+                nombre: values.nameApp,
+                descripcion: values.descApp,
+                codigo: values.codigoApp,
+                dnsIpDestino: values.ipApp,
+                statusApp: values.statusApp
+              };
+              console.log('add edit: ',  app);
+            }}
+          >
+          {({handleBlur, handleChange, handleSubmit, values, errors, touched }) => (
+            <div className="w-full md:w-2/5">
               <div>
-                <label
-                  htmlFor="descApp"
-                  className="text-slate-900 text-sm flex items-center"
-                >
-                  Nombre <span className="text-red-400 mx-2">*</span>
-                </label>
-                <input
-                  className="bg-white w-full py-2 px-3 border border-gray-300 rounded-md text-sm"
-                  type="text"
-                  id="nameApp"
-                  name="nameApp"
-                  placeholder="Nombre"
-                  onBlur={formikApp.handleBlur}
-                  onChange={formikApp.handleChange}
-                  value={formikApp.values.nameApp}
-                />
+                <h1 className="text-gray-900 text-3xl font-extrabold tracking-tight">
+                  Datos del app: {id}
+                </h1>
+                <h5 className=" text-slate-500 text-sm">
+                  Ingresar principales datos del app.
+                </h5>
+              </div>
+              <div className="p-4 mt-4 rounded-md bg-white w-full flex flex-col gap-3">
                 <div>
-                  {
-                    formikApp.touched.nameApp && formikApp.errors.nameApp ? (
-                      <span className="text-xs text-red-500">
-                        {formikApp.errors.nameApp}
-                      </span>
-                    ) : null
-                  }
-                </div>
-              </div>
-              <div>
-                <label
-                  htmlFor="descApp"
-                  className="text-slate-900 text-sm flex items-center"
-                >
-                  Descripción <span className="text-red-400 mx-2">*</span>
-                </label>
-                <input
-                  className="bg-white w-full py-2 px-3 border border-gray-300 rounded-md text-sm"
-                  type="text"
-                  id="descApp"
-                  name="descApp"
-                  placeholder="Descripción"
-                  onBlur={formikApp.handleBlur}
-                  onChange={formikApp.handleChange}
-                  value={formikApp.values.descApp}
-                />
-                <div>
-                  {
-                    formikApp.touched.descApp && formikApp.errors.descApp ? (
-                      <span className="text-xs text-red-500">
-                        {formikApp.errors.descApp}
-                      </span>
-                    ) : null
-                  }
-                </div>
-              </div>
-              <div>
-                <label
-                  htmlFor="ipApp"
-                  className="text-slate-900 text-sm flex items-center"
-                >
-                  Dns / Ip destino <span className="text-red-400 mx-2">*</span>
-                </label>
-                <input
-                  className="bg-white w-full py-2 px-3 border border-gray-300 rounded-md text-sm"
-                  type="text"
-                  id="ipApp"
-                  name="ipApp"
-                  placeholder="Dns / Ip destino"
-                  onBlur={formikApp.handleBlur}
-                  onChange={formikApp.handleChange}
-                  value={formikApp.values.ipApp}
-                />
-                <div>
-                  {
-                    formikApp.touched.ipApp && formikApp.errors.ipApp ? (
-                      <span className="text-xs text-red-500">
-                        {formikApp.errors.ipApp}
-                      </span>
-                    ) : null
-                  }
-                </div>
-              </div>
-              <div>
-                <label
-                  htmlFor="email-address"
-                  className="text-slate-900 text-sm flex items-center"
-                >
-                  Estado <span className="text-red-400 mx-2">*</span>
-                </label>
-                <select
-                  id="country"
-                  name="country"
-                  autoComplete="country-name"
-                  className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-                  onBlur={formikApp.handleBlur}
-                  onChange={formikApp.handleChange}
-                  value={formikApp.values.statusApp}
-                >
-                  <option value="1">Activo</option>
-                  <option value="0">Inactivo</option>
-                </select>
-              </div>
-              <div>
-                <button className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-700 hover:bg-blue-800"
-                type="submit"
-                >
-                  Guardar
-                </button>
-              </div>
-            </div>
-          </form>
-          <form id="form2" onSubmit={formikEndPoints.handleSubmit} className="w-full md:w-3/5">
-            <div>
-              <h1 className="text-gray-900 text-3xl font-extrabold tracking-tight">
-                Datalle del endpoint
-              </h1>
-              <h5 className=" text-slate-500 text-sm">
-                Ingresar datos de cada uno de los endpoints.
-              </h5>
-            </div>
-            <div className="p-4 mt-4 rounded-md bg-white w-full flex flex-col gap-4 ">
-              <div className=" w-full flex flex-col md:flex-row gap-4">
-                <div className="w-full flex flex-col gap-3">
+                  <label
+                    htmlFor="descApp"
+                    className="text-slate-900 text-sm flex items-center"
+                  >
+                    Nombre <span className="text-red-400 mx-2">*</span>
+                  </label>
+                  <input
+                    className="bg-white w-full py-2 px-3 border border-gray-300 rounded-md text-sm"
+                    type="text"
+                    id="nameApp"
+                    name="nameApp"
+                    placeholder="Nombre"
+                    onBlur={handleBlur("nameApp")}
+                    onChange={handleChange("nameApp")}
+                    value={values.nameApp}
+                  />
                   <div>
-                    <label
-                      htmlFor="descEndPoint"
-                      className="text-slate-900 text-sm flex items-center"
-                    >
-                      Descripción <span className="text-red-400 mx-2">*</span>
-                    </label>
-                    <input
-                      className="bg-white w-full py-2 px-3 border border-gray-300 rounded-md text-sm"
-                      type="text"
-                      id="descEndPoint"
-                      name="descEndPoint"
-                      placeholder="Descripción"
-                      onBlur={formikEndPoints.handleBlur}
-                      onChange={formikEndPoints.handleChange}
-                      value={formikEndPoints.values.descEndPoint}
-                    />
-                    <div>
-                  {
-                    formikEndPoints.touched.descEndPoint && formikEndPoints.errors.descEndPoint ? (
-                      <span className="text-xs text-red-500">
-                        {formikEndPoints.errors.descEndPoint}
-                      </span>
-                    ) : null
-                  }
-                </div>
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="pathEndPoint"
-                      className="text-slate-900 text-sm flex items-center"
-                    >
-                      Path <span className="text-red-400 mx-2">*</span>
-                    </label>
-                    <input
-                      className="bg-white w-full py-2 px-3 border border-gray-300 rounded-md text-sm"
-                      type="text"
-                      id="pathEndPoint"
-                      name="pathEndPoint"
-                      placeholder="Path"
-                      onBlur={formikEndPoints.handleBlur}
-                      onChange={formikEndPoints.handleChange}
-                      value={formikEndPoints.values.pathEndPoint}
-                    />
                     {
-                    formikEndPoints.touched.pathEndPoint && formikEndPoints.errors.pathEndPoint ? (
-                      <span className="text-xs text-red-500">
-                        {formikEndPoints.errors.pathEndPoint}
-                      </span>
-                    ) : null
-                  }
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="statusEndPoint"
-                      className="text-slate-900 text-sm flex items-center"
-                    >
-                      Estado <span className="text-red-400 mx-2">*</span>
-                    </label>
-                    <select
-                      id="statusEndPoint"
-                      name="statusEndPoint"
-                      className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-                      onBlur={formikEndPoints.handleBlur}
-                      onChange={formikEndPoints.handleChange}
-                      value={formikEndPoints.values.statusEndPoint}
-                    >
-                      <option value="1">Activo</option>
-                      <option value="0">Inactivo</option>
-                    </select>
+                      touched.nameApp && errors.nameApp ? (
+                        <span className="text-xs text-red-500">
+                          {errors.nameApp}
+                        </span>
+                      ) : null
+                    }
                   </div>
                 </div>
-                <div className="w-full flex flex-col gap-3">
+                <div>
+                  <label
+                    htmlFor="descApp"
+                    className="text-slate-900 text-sm flex items-center"
+                  >
+                    Descripción <span className="text-red-400 mx-2">*</span>
+                  </label>
+                  <input
+                    className="bg-white w-full py-2 px-3 border border-gray-300 rounded-md text-sm"
+                    type="text"
+                    id="descApp"
+                    name="descApp"
+                    placeholder="Descripción"
+                    onBlur={handleBlur("descApp")}
+                    onChange={handleChange("descApp")}
+                    value={values.descApp}
+                  />
                   <div>
-                    <label
-                      htmlFor="jsonErrorGeneralEndPoint"
-                      className="text-slate-900 text-sm flex items-center"
-                    >
-                      Json error general
-                    </label>
-                    <input
-                      className="bg-white w-full py-2 px-3 border border-gray-300 rounded-md text-sm"
-                      type="text"
-                      id="jsonErrorGeneralEndPoint"
-                      name="jsonErrorGeneralEndPoint"
-                      placeholder="Json error general"
-                      onBlur={formikEndPoints.handleBlur}
-                      onChange={formikEndPoints.handleChange}
-                      value={formikEndPoints.values.jsonErrorGeneralEndPoint}
-                    />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="jsonBodyEndPoint"
-                      className="text-slate-900 text-sm flex items-center"
-                    >
-                      Json boby request (ejemplo)
-                    </label>
-                    <input
-                      className="bg-white w-full py-2 px-3 border border-gray-300 rounded-md text-sm"
-                      type="text"
-                      id="jsonBodyEndPoint"
-                      name="jsonBodyEndPoint"
-                      placeholder="Json boby request"
-                      onBlur={formikEndPoints.handleBlur}
-                      onChange={formikEndPoints.handleChange}
-                      value={formikEndPoints.values.jsonBodyEndPoint}
-                    />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="metodoRest"
-                      className="text-slate-900 text-sm flex items-center"
-                    >
-                      Tipo método <span className="text-red-400 mx-2">*</span>
-                    </label>
-                    <select
-                      id="metodoRest"
-                      name="metodoRest"
-                      className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-                      onBlur={formikEndPoints.handleBlur}
-                      onChange={formikEndPoints.handleChange}
-                      value={formikEndPoints.values.metodoRest}
-                    >
-                      <option value="POST">POST</option>
-                      <option value="GET">GET</option>
-                      <option value="DELETE">DELETE</option>
-                      <option value="HEAD">HEAD</option>
-                      <option value="PUT">PUT</option>
-                      <option value="PATCH">PATCH</option>
-                      <option value="OPTION">OPTIONS</option>
-                      <option value="TRACE">TRACE</option>
-                    </select>
+                    {
+                      touched.descApp && errors.descApp ? (
+                        <span className="text-xs text-red-500">
+                          {errors.descApp}
+                        </span>
+                      ) : null
+                    }
                   </div>
                 </div>
-              </div>
-
-              <div className=" w-full flex flex-row gap-4">
+                <div>
+                  <label
+                    htmlFor="ipApp"
+                    className="text-slate-900 text-sm flex items-center"
+                  >
+                    Dns / Ip destino <span className="text-red-400 mx-2">*</span>
+                  </label>
+                  <input
+                    className="bg-white w-full py-2 px-3 border border-gray-300 rounded-md text-sm"
+                    type="text"
+                    id="ipApp"
+                    name="ipApp"
+                    placeholder="Dns / Ip destino"
+                    onBlur={handleBlur("ipApp")}
+                    onChange={handleChange("ipApp")}
+                    value={values.ipApp}
+                  />
+                  <div>
+                    {
+                      touched.ipApp && errors.ipApp ? (
+                        <span className="text-xs text-red-500">
+                          {errors.ipApp}
+                        </span>
+                      ) : null
+                    }
+                  </div>
+                </div>
+                <div>
+                  <label
+                    htmlFor="email-address"
+                    className="text-slate-900 text-sm flex items-center"
+                  >
+                    Estado <span className="text-red-400 mx-2">*</span>
+                  </label>
+                  <select
+                    id="statusApp"
+                    name="statusApp"
+                    autoComplete="country-name"
+                    className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                    onBlur={handleBlur("statusApp")}
+                    onChange={handleChange("statusApp")}
+                    value={values.statusApp}
+                  >
+                    <option value="1">Activo</option>
+                    <option value="0">Inactivo</option>
+                  </select>
+                </div>
                 <div>
                   <button className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-700 hover:bg-blue-800"
-                  type="submit"
+                  onClick={() => handleSubmit()}
                   >
-                    Agregar
+                    Guardar
                   </button>
                 </div>
               </div>
             </div>
-          </form>
+          )}
+          </Formik>
+          ) : (
+            <div className="w-full md:w-2/5">
+              Loading...
+            </div>
+          )
+        }
+
+        <div id="form2" className="w-full md:w-3/5">
+          <div>
+            <h1 className="text-gray-900 text-3xl font-extrabold tracking-tight">
+              Datalle del endpoint
+            </h1>
+            <h5 className=" text-slate-500 text-sm">
+              Ingresar datos de cada uno de los endpoints.
+            </h5>
+          </div>
+                <div className="p-4 mt-4 rounded-md bg-white w-full flex flex-col gap-4 ">
+                  <div className=" w-full flex flex-col md:flex-row gap-4">
+                    <div className="w-full flex flex-col gap-3">
+                      <div>
+                        <label
+                          htmlFor="descEndPoint"
+                          className="text-slate-900 text-sm flex items-center"
+                        >
+                          Descripción <span className="text-red-400 mx-2">*</span>
+                        </label>
+                        <input
+                          className="bg-white w-full py-2 px-3 border border-gray-300 rounded-md text-sm"
+                          type="text"
+                          id="descEndPoint"
+                          name="descEndPoint"
+                          placeholder="Descripción"
+                          onChange={(e) => setDescEndPoint(e.target.value)}
+                          value={descEndPoint}
+                        />
+                        {/* <div>
+                          {
+                            touched.descEndPoint && errors.descEndPoint ? (
+                              <span className="text-xs text-red-500">
+                                {errors.descEndPoint}
+                              </span>
+                            ) : null
+                          }
+                        </div> */}
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="pathEndPoint"
+                          className="text-slate-900 text-sm flex items-center"
+                        >
+                          Path <span className="text-red-400 mx-2">*</span>
+                        </label>
+                        <input
+                          className="bg-white w-full py-2 px-3 border border-gray-300 rounded-md text-sm"
+                          type="text"
+                          id="pathEndPoint"
+                          name="pathEndPoint"
+                          placeholder="Path"
+                          onChange={(e) => setPathEndPoint(e.target.value)}
+                          value={pathEndPoint}
+                        />
+                        {/* {
+                        touched.pathEndPoint && errors.pathEndPoint ? (
+                          <span className="text-xs text-red-500">
+                            {errors.pathEndPoint}
+                          </span>
+                        ) : null
+                      } */}
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="statusEndPoint"
+                          className="text-slate-900 text-sm flex items-center"
+                        >
+                          Estado <span className="text-red-400 mx-2">*</span>
+                        </label>
+                        <select
+                          id="statusEndPoint"
+                          name="statusEndPoint"
+                          className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                          onChange={(e) => setStatusEndPoint(e.target.value)}
+                          value={statusEndPoint}
+                        >
+                          <option value="1">Activo</option>
+                          <option value="0">Inactivo</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div className="w-full flex flex-col gap-3">
+                      <div>
+                        <label
+                          htmlFor="jsonErrorGeneralEndPoint"
+                          className="text-slate-900 text-sm flex items-center"
+                        >
+                          Json error general
+                        </label>
+                        <input
+                          className="bg-white w-full py-2 px-3 border border-gray-300 rounded-md text-sm"
+                          type="text"
+                          id="jsonErrorGeneralEndPoint"
+                          name="jsonErrorGeneralEndPoint"
+                          placeholder="Json error general"
+                          onChange={(e) => setJsonErrorGeneralEndPoint(e.target.value)}
+                          value={jsonErrorGeneralEndPoint}
+                        />
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="jsonBodyEndPoint"
+                          className="text-slate-900 text-sm flex items-center"
+                        >
+                          Json boby request (ejemplo)
+                        </label>
+                        <input
+                          className="bg-white w-full py-2 px-3 border border-gray-300 rounded-md text-sm"
+                          type="text"
+                          id="jsonBodyEndPoint"
+                          name="jsonBodyEndPoint"
+                          placeholder="Json boby request"
+                          onChange={(e) => setJsonBodyEndPoint(e.target.value)}
+                          value={jsonBodyEndPoint}
+                        />
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="metodoRest"
+                          className="text-slate-900 text-sm flex items-center"
+                        >
+                          Tipo método <span className="text-red-400 mx-2">*</span>
+                        </label>
+                        <select
+                          id="metodoRest"
+                          name="metodoRest"
+                          className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                          onChange={(e) => setMetodoRest(e.target.value)}
+                          value={metodoRest}
+                        >
+                          <option value="POST">POST</option>
+                          <option value="GET">GET</option>
+                          <option value="DELETE">DELETE</option>
+                          <option value="HEAD">HEAD</option>
+                          <option value="PUT">PUT</option>
+                          <option value="PATCH">PATCH</option>
+                          <option value="OPTION">OPTIONS</option>
+                          <option value="TRACE">TRACE</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div className=" w-full flex flex-row gap-4">
+                    <div>
+                      <button className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-700 hover:bg-blue-800"
+                      onClick={() => handleSubmitEndPoint()}
+                      >
+                       {actionsEndPoint == "edit" ? "Editar" : "Agregar"} 
+                      </button>
+                    </div>
+                    <div>
+                      <button className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-700 hover:bg-blue-800"
+                      onClick={() => handleCancel()}
+                      >
+                       Cancelar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+        </div>
         </section>
         <section className="mt-10 p-4">
           <div className="flex justify-between items-center">
@@ -530,11 +495,16 @@ export default function EditApp() {
                   )
                 }
                 </div>
-                <div className="w-full text-center">
+                <div className="w-full flex justify-center gap-2">
                   <button className="bg-blue-700 hover:bg-blue-800 text-white p-2 font-semibold text-xs rounded-md"
                   onClick={() => handleDeleteEndPoint(item.id)}
                   >
                     Eliminar
+                  </button>
+                  <button className="bg-blue-700 hover:bg-blue-800 text-white p-2 font-semibold text-xs rounded-md"
+                  onClick={() => handleEdit(item)}
+                  >
+                    Editar
                   </button>
                 </div>
               </div>)
