@@ -45,6 +45,17 @@ export const fetchLogin = (user, password) => {
       });
   };
 
+  export const fetchUpdateApp = (app) => {
+    return axios
+      .post(URLS.URL_EDIT_APPS, app)
+      .then((response) => {
+        return {status: 0, response}
+      })
+      .catch((error) => {
+        return {status: 99, error}
+      });
+  };
+
   export const fetchAddEndpoint = (endpoint) => {
     return axios
       .post(URLS.URL_ADD_ENDPOINTS, endpoint)
@@ -55,6 +66,19 @@ export const fetchLogin = (user, password) => {
         return {status: 99, error}
       });
   };
+
+
+  export const fetchEditEndpoint = (data) => {
+    return axios
+      .post(URLS.URL_EDIT_ENDPOINTS, data)
+      .then((response) => {
+        return {status: 0, response}
+      })
+      .catch((error) => {
+        return {status: 99, error}
+      });
+  };
+
 
   export const fetchGetAppByCode = (codeApp) => {
     return axios
@@ -80,7 +104,7 @@ export const fetchLogin = (user, password) => {
 
   export const fetchDeleteEndPoint = (id) => {
     return axios
-      .delete(`${URLS.URL_REMOVE_ENDPOINT}?id=${id}`)
+      .post(`${URLS.URL_REMOVE_ENDPOINT}?id=${id}`)
       .then((response) => {
         return {status: 0, response}
       })

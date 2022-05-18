@@ -91,6 +91,7 @@ export default function NewApp() {
         };
 
         fetchAddEndpoint(endPoint).then(rsp => {
+          console.log(rsp);
            const { data, request, status } = rsp.response;
            if(status == 200 && data.status == 0){
               alert('Enpoint agregado con correctamente')

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/router";
 import Image from "next/image";
 import Link from "next/link";
-import { fetchAddApp, fetchAddEndpoint, fetchGetAppByCode, fetchGetEndPointsByIdApp, fetchDeleteEndPoint } from "../../../services/servicesData";
+import { fetchEditEndpoint, fetchAddEndpoint, fetchGetAppByCode, fetchGetEndPointsByIdApp, fetchDeleteEndPoint, fetchUpdateApp } from "../../../services/servicesData";
 import { Formik } from "formik";
 import * as Yup from "yup";
 
@@ -23,6 +23,7 @@ export default function EditApp() {
   });
 
   const [codeApp, setCodeApp] = useState("");
+  const [idPoint, setIdEndPoint] = useState("");
   const [descEndPoint, setDescEndPoint] = useState("");
   const [pathEndPoint, setPathEndPoint] = useState("");
   const [jsonErrorGeneralEndPoint, setJsonErrorGeneralEndPoint] = useState("");
@@ -79,19 +80,27 @@ export default function EditApp() {
       }
     };
     initApp();
-  },[id]);
+  },[id,actualizaListEndpoints]);
 
+  
   const handleDeleteEndPoint = (id) => {
-    
     fetchDeleteEndPoint(id).then(rsp => {
       console.log('rsp: ', rsp);
-      alert('Enpoint eliminado correctamente');
-      // setActualizaListEndpoints(!actualizaListEndpoints)
+      if(rsp.status != 0)
+      {
+        alert(rsp.error.message);
+      }
+      else
+      {
+        alert('Enpoint eliminado correctamente');
+        setActualizaListEndpoints(!actualizaListEndpoints)
+      }
     });
   };
 
   const handleEdit = (data) => {
     console.log("handleEdit: ", data);
+    setIdEndPoint(data.id);
     setActionsEndPoint("edit");
     setCodeApp(app.id);
     setDescEndPoint(data.descripcion);
@@ -114,8 +123,57 @@ export default function EditApp() {
   };
 
   const handleSubmitEndPoint = () => {
-
+    if(actionsEndPoint != 'edit'){
+      addEndpoint();
+    }
+    else{
+      editEndpoint();
+    }
   };
+
+  const addEndpoint = () => {
+    const data = {
+      p_aplicacion: app.id,
+      p_path: pathEndPoint,
+      p_descripcion: descEndPoint,
+      p_jsonRequest: jsonBodyEndPoint,
+      p_jsonResponseErrorDefault: jsonErrorGeneralEndPoint,
+      p_metodoRestApi: metodoRest,
+      p_estado: statusEndPoint,
+    };
+
+    fetchAddEndpoint(data).then(rsp => {
+       const { data, request, status } = rsp.response;
+       if(status == 200 && data.status == 0){
+          alert('Enpoint agregado con correctamente')
+          setActualizaListEndpoints(!actualizaListEndpoints);
+       } else {
+          alert(data.msg)
+       }
+    });
+  }
+
+  const editEndpoint = () => {
+    const data = {
+      p_id: idPoint,
+      p_path: pathEndPoint,
+      p_descripcion: descEndPoint,
+      p_jsonRequest: jsonBodyEndPoint,
+      p_jsonResponseErrorDefault: jsonErrorGeneralEndPoint,
+      p_metodoRestApi: metodoRest,
+      p_estado: statusEndPoint,
+    };
+
+    fetchEditEndpoint(data).then(rsp => {
+       const { data, request, status } = rsp.response;
+       if(status == 200 && data.status == 0){
+          alert('Enpoint editado con correctamente')
+          setActualizaListEndpoints(!actualizaListEndpoints);
+       } else {
+          alert(data.msg)
+       }
+    });
+  }
 
   return (
     <div className="w-full h-screen bg-slate-100">
@@ -136,7 +194,9 @@ export default function EditApp() {
             <a className="text-blue-800 font-semibold">Logs</a>
           </Link>
         </div>
-        <button className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-700 hover:bg-blue-800">
+        <button className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-700 hover:bg-blue-800"
+          onClick={() => router.push('/')}
+        >
           Cerrar sesión
         </button>
       </nav>
@@ -157,9 +217,32 @@ export default function EditApp() {
                 descripcion: values.descApp,
                 codigo: values.codigoApp,
                 dnsIpDestino: values.ipApp,
-                statusApp: values.statusApp
+                estado: parseInt(values.statusApp)
               };
-              console.log('add edit: ',  app);
+
+              fetchUpdateApp(app).then(rsp => {
+                console.log('add edit: ',  app);
+                const { data, request, status } = rsp.response;
+                if(status == 200 && data.status == 0){
+                    alert('App editada correctamente')
+                    setInitVal({
+                    nameApp: app.nombre,
+                    descApp: app.descripcion,
+                    ipApp: app.dnsIpDestino,
+                    statusApp: app.estado.toString(),
+                    codigoApp: app.codigo,
+                  })
+                  setApp({
+                    nameApp: app.nombre,
+                    descApp: app.descripcion,
+                    ipApp: app.dnsIpDestino,
+                    statusApp: app.estado.toString(),
+                    codigoApp: app.codigo,
+                  });
+                } else {
+                    alert(data.msg)
+                }
+              });
             }}
           >
           {({handleBlur, handleChange, handleSubmit, values, errors, touched }) => (
@@ -446,7 +529,7 @@ export default function EditApp() {
                       <button className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-700 hover:bg-blue-800"
                       onClick={() => handleCancel()}
                       >
-                       Cancelar
+                       Limpiar / Cancelar
                       </button>
                     </div>
                   </div>

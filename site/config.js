@@ -8,7 +8,9 @@ export const URLS = {
     URL_GET_ENDPOINTS_BY_ID_APP: `${API_URL}/api/endpointsbyidap`,
     URL_REMOVE_ENDPOINT: `${API_URL}/api/removeendpoint`,
     URL_ADD_APPS: `${API_URL}/api/addapp`,
+    URL_EDIT_APPS: `${API_URL}/api/updateapp`,
     URL_ADD_ENDPOINTS: `${API_URL}/api/addendpoint`,
+    URL_EDIT_ENDPOINTS: `${API_URL}/api/updateepoint`,
     URL_GET_APP: `${API_URL}/api/appbycode`,
     
 };
