@@ -15,6 +15,7 @@
     "ip": "^1.1.8",
     "ip-address": "^8.1.0",
     "next": "12.1.0",
+    "promise": "^8.1.0",
     "react": "17.0.2",
     "react-cookie": "^4.1.1",
     "react-dom": "17.0.2",

@@ -4,6 +4,7 @@ import Narvar from '../components/Narvar'
 // import { parseCookies } from "../libs/parseCookies"
 import { useRouter } from 'next/router'
 import { fetGetAllApps, fetGetAllEndPoints } from '../services/servicesData'; 
+var Promise = require('promise');
 
 export default function Dashboard() {
 
@@ -13,7 +14,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     const getData = () => {
-      new Promise.all([fetGetAllApps().then(rsp => rsp), fetGetAllEndPoints().then(rsp => rsp)])
+      Promise.all([fetGetAllApps().then(rsp => rsp), fetGetAllEndPoints().then(rsp => rsp)])
       .then(rsp => {
         rsp.forEach(element => {
           const { data, request, status } = element.response;
