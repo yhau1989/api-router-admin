@@ -21,8 +21,6 @@ export default function Home() {
   const [ error, setError] = useState('');
   const [setCookie] = useCookies('ok');
 
-  var address = new Address6('2001:0:ce49:7601:e866:efff:62c3:fffe');
-  var teredo = address.inspectTeredo();
   
 
   const login  = () => {
