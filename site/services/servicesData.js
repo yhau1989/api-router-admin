@@ -113,4 +113,17 @@ export const fetchLogin = (user, password) => {
       });
   };
 
+
+  
+export const fetchIp = () => {
+  return axios
+    .get('https://www.cloudflare.com/cdn-cgi/trace')
+    .then((response) => {
+      return {status: 0, response}
+    })
+    .catch((error) => {
+      return {status: 99, error}
+    });
+};
+
   

@@ -1,17 +1,8 @@
-import { useState } from 'react'
-// import Head from "next/head";
-// import Link from 'next/link'
-import { fetchLogin } from '../services/servicesData'; 
-// import Image from 'next/image'
-// import styles from '../styles/Home.module.css'
-import { useCookies } from "react-cookie"
+import { useState, useEffect } from 'react'
+import { fetchLogin, fetchIp } from '../services/servicesData'; 
+import Cookies from 'universal-cookie';
 import { parseCookies } from "../libs/parseCookies"
 import { useRouter } from 'next/router'
-var ip = require('ip');
-// var Address6 = require('ip-address').Address6;
-// var address = new Address6('2001:0:ce49:7601:e866:efff:62c3:fffe');
-// var teredo = address.inspectTeredo();
-// teredo.client4; 
 
 export default function Home() {
 
@@ -19,20 +10,26 @@ export default function Home() {
   const [ email, setEmail] = useState('');
   const [ password, setPassword] = useState('');
   const [ error, setError] = useState('');
-  const [setCookie] = useCookies('ok');
-
-  
+  const cookies = new Cookies();
+  const [ipClient, setIpClient] = useState(null);
 
   const login  = () => {
     fetchLogin(email, password).then(rsp => {
       const { status, response } = rsp;
       if(status == 0 && response.data.status == 0)
       {
-        setCookie("userLogin", 'ok', {
+        cookies.set("userLogin", 'ok', {
           path: "/",
           maxAge: 3600, // Expires after 1hr
           sameSite: true,
-        })
+        });
+
+        cookies.set("ipClient", ipClient, {
+          path: "/",
+          maxAge: 3600, // Expires after 1hr
+          sameSite: true,
+        });
+
         router.push("/dashboard")
       }
       else
@@ -44,6 +41,25 @@ export default function Home() {
     })
   }
 
+  useEffect(() => {
+    const getIpClient = () => {
+      fetchIp().then(rsp => {
+        const { status, error, response } = rsp;
+        if(status == 0 && response.status == 200)
+        {
+          const ip = response.data.split('\n')[2];
+          console.log('fetchIp ok: ', ip);
+          setIpClient(ip);
+        }
+        else
+        {
+          console.log('fetchIp error: ', error);
+        }
+      });
+    }
+    getIpClient();
+  }, []);
+
   return (
     <div className="w-full h-screen flex">
       
@@ -54,7 +70,7 @@ export default function Home() {
           </div>
           <div>
             <label htmlFor="email-address" className="text-white text-sm">
-              Email {ip.address()}
+              Email {ipClient}
             </label>
             <input
               className="bg-white w-full text-sm py-2 px-3 rounded-md text-gray-700"

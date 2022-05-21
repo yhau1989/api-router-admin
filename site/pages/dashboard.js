@@ -3,7 +3,8 @@ import Link from 'next/link'
 import Narvar from '../components/Narvar'
 // import { parseCookies } from "../libs/parseCookies"
 import { useRouter } from 'next/router'
-import { fetGetAllApps, fetGetAllEndPoints } from '../services/servicesData'; 
+import { fetGetAllApps, fetGetAllEndPoints } from '../services/servicesData';
+import Cookies from 'universal-cookie';
 var Promise = require('promise');
 
 export default function Dashboard() {
@@ -11,6 +12,11 @@ export default function Dashboard() {
   const router = useRouter();
   const [totalsApps, setTotalsApps] = useState([]);
   const [totalsEndPoints, setTotalsEndPoints] = useState(0);
+  const cookies = new Cookies();
+
+  const ip = cookies.get("ipClient");
+
+
 
   useEffect(() => {
     const getData = () => {
@@ -44,6 +50,7 @@ export default function Dashboard() {
         <section className="my-10 p-4 flex flex-row gap-20 justify-center">
           <div className="shadow-md rounded-md p-4 w-32 flex flex-col gap-4 justify-center items-center text-slate-500 bg-white">
             Apps
+            {ip}
             <h1 className="text-gray-900 text-3xl font-extrabold tracking-tight">
               { totalsApps.length }
             </h1>
