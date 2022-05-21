@@ -41,10 +41,10 @@ export default function NewApp() {
       };
 
       fetchAddApp(app).then(rsp => {
-        const { data, request, status } = rsp.response;
+        const { data, status } = rsp.response;
         if(status == 200 && data.status == 0){
           fetchGetAppByCode(values.codigoApp).then( xresp => {
-            const { data, request, status } = xresp.response;
+            const { data, status } = xresp.response;
             if(status == 200 && data.status == 0){
               alert('App agregada con exito')
               setIdApp(data.data);
@@ -92,7 +92,7 @@ export default function NewApp() {
 
         fetchAddEndpoint(endPoint).then(rsp => {
           console.log(rsp);
-           const { data, request, status } = rsp.response;
+           const { data, status } = rsp.response;
            if(status == 200 && data.status == 0){
               alert('Enpoint agregado con correctamente')
               setActualizaListEndpoints(!actualizaListEndpoints);
@@ -117,7 +117,7 @@ export default function NewApp() {
       if(idApp)
       {
         fetchGetEndPointsByIdApp(idApp.id).then(rsp => {
-          const { data, request, status } = rsp.response;
+          const { data, status } = rsp.response;
           if(status == 200 && data.status == 0){
             console.log('fetchGetEndPointsByIdApp', data.data);
             setEndPoints([...data.data]);

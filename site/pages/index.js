@@ -7,19 +7,19 @@ import { fetchLogin } from '../services/servicesData';
 import { useCookies } from "react-cookie"
 import { parseCookies } from "../libs/parseCookies"
 import { useRouter } from 'next/router'
-var ip = require('ip');
+// var ip = require('ip');
 var Address6 = require('ip-address').Address6;
 var address = new Address6('2001:0:ce49:7601:e866:efff:62c3:fffe');
 var teredo = address.inspectTeredo();
 teredo.client4; 
 
-export default function Home({ data }) {
+export default function Home() {
 
   const router = useRouter();
   const [ email, setEmail] = useState('');
   const [ password, setPassword] = useState('');
   const [ error, setError] = useState('');
-  const [cookie, setCookie] = useCookies('ok');
+  const [setCookie] = useCookies('ok');
 
   var address = new Address6('2001:0:ce49:7601:e866:efff:62c3:fffe');
   var teredo = address.inspectTeredo();
@@ -27,7 +27,7 @@ export default function Home({ data }) {
 
   const login  = () => {
     fetchLogin(email, password).then(rsp => {
-      const { status, response, error } = rsp;
+      const { status, response } = rsp;
       if(status == 0 && response.data.status == 0)
       {
         setCookie("userLogin", 'ok', {

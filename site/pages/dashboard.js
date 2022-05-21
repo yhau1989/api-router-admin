@@ -1,7 +1,7 @@
 import { useEffect, useState} from 'react'
 import Link from 'next/link'
 import Narvar from '../components/Narvar'
-import { parseCookies } from "../libs/parseCookies"
+// import { parseCookies } from "../libs/parseCookies"
 import { useRouter } from 'next/router'
 import { fetGetAllApps, fetGetAllEndPoints } from '../services/servicesData'; 
 
@@ -13,7 +13,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     const getData = () => {
-      Promise.all([fetGetAllApps().then(rsp => rsp), fetGetAllEndPoints().then(rsp => rsp)])
+      new Promise.all([fetGetAllApps().then(rsp => rsp), fetGetAllEndPoints().then(rsp => rsp)])
       .then(rsp => {
         rsp.forEach(element => {
           const { data, request, status } = element.response;

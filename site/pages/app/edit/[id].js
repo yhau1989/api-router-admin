@@ -22,7 +22,7 @@ export default function EditApp() {
     codigoApp: "",
   });
 
-  const [codeApp, setCodeApp] = useState("");
+  // const [codeApp, setCodeApp] = useState("");
   const [idPoint, setIdEndPoint] = useState("");
   const [descEndPoint, setDescEndPoint] = useState("");
   const [pathEndPoint, setPathEndPoint] = useState("");
@@ -40,7 +40,7 @@ export default function EditApp() {
       if(id)
       {
           fetchGetAppByCode(id).then( xresp => {
-            const { data, request, status } = xresp.response;
+            const { data, status } = xresp.response;
             if(status == 200 && data.status == 0){
                 console.log('app', data.data);
                 setInitVal({
@@ -66,7 +66,7 @@ export default function EditApp() {
       if(app)
       {
         fetchGetEndPointsByIdApp(app.id).then(rsp => {
-          const { data, request, status } = rsp.response;
+          const { data, status } = rsp.response;
           if(status == 200 && data.status == 0){
             console.log('fetchGetEndPointsByIdApp', data.data);
             setEndPoints([...data.data]);
@@ -102,7 +102,7 @@ export default function EditApp() {
     console.log("handleEdit: ", data);
     setIdEndPoint(data.id);
     setActionsEndPoint("edit");
-    setCodeApp(app.id);
+    // setCodeApp(app.id);
     setDescEndPoint(data.descripcion);
     setPathEndPoint(data.path);
     setJsonErrorGeneralEndPoint(data.jsonResponseErrorDefault?.length > 0 ? data.jsonResponseErrorDefault : "");
@@ -113,7 +113,7 @@ export default function EditApp() {
 
   const handleCancel = () => {
     setActionsEndPoint("add");
-    setCodeApp(app.id);
+    // setCodeApp(app.id);
     setDescEndPoint("");
     setPathEndPoint("");
     setJsonErrorGeneralEndPoint("");
@@ -143,7 +143,7 @@ export default function EditApp() {
     };
 
     fetchAddEndpoint(data).then(rsp => {
-       const { data, request, status } = rsp.response;
+       const { data, status } = rsp.response;
        if(status == 200 && data.status == 0){
           alert('Enpoint agregado con correctamente')
           setActualizaListEndpoints(!actualizaListEndpoints);
@@ -165,7 +165,7 @@ export default function EditApp() {
     };
 
     fetchEditEndpoint(data).then(rsp => {
-       const { data, request, status } = rsp.response;
+       const { data, status } = rsp.response;
        if(status == 200 && data.status == 0){
           alert('Enpoint editado con correctamente')
           setActualizaListEndpoints(!actualizaListEndpoints);
@@ -222,7 +222,7 @@ export default function EditApp() {
 
               fetchUpdateApp(app).then(rsp => {
                 console.log('add edit: ',  app);
-                const { data, request, status } = rsp.response;
+                const { data, status } = rsp.response;
                 if(status == 200 && data.status == 0){
                     alert('App editada correctamente')
                     setInitVal({
