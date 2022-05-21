@@ -7,11 +7,11 @@ import { fetchLogin } from '../services/servicesData';
 import { useCookies } from "react-cookie"
 import { parseCookies } from "../libs/parseCookies"
 import { useRouter } from 'next/router'
-// var ip = require('ip');
-var Address6 = require('ip-address').Address6;
-var address = new Address6('2001:0:ce49:7601:e866:efff:62c3:fffe');
-var teredo = address.inspectTeredo();
-teredo.client4; 
+var ip = require('ip');
+// var Address6 = require('ip-address').Address6;
+// var address = new Address6('2001:0:ce49:7601:e866:efff:62c3:fffe');
+// var teredo = address.inspectTeredo();
+// teredo.client4; 
 
 export default function Home() {
 
@@ -56,7 +56,7 @@ export default function Home() {
           </div>
           <div>
             <label htmlFor="email-address" className="text-white text-sm">
-              Email {teredo.client4}
+              Email {ip.address()}
             </label>
             <input
               className="bg-white w-full text-sm py-2 px-3 rounded-md text-gray-700"
