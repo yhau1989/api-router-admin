@@ -1,11 +1,10 @@
 import { useEffect, useState} from 'react'
 import Link from 'next/link'
-import Narvar from '../components/Narvar'
-// import { parseCookies } from "../libs/parseCookies"
 import { useRouter } from 'next/router'
 import { fetGetAllApps, fetGetAllEndPoints } from '../services/servicesData';
 import Cookies from 'universal-cookie';
 var Promise = require('promise');
+import Narvar from '../components/Narvar'
 
 export default function Dashboard() {
 

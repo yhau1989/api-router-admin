@@ -6,6 +6,7 @@ import { fetchAddApp, fetchAddEndpoint, fetchGetAppByCode, fetchGetEndPointsById
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import Cookies from 'universal-cookie';
+import Narvar from '../../components/Narvar'
 
 
 export default function NewApp() {
@@ -91,7 +92,8 @@ export default function NewApp() {
           p_jsonRequest: values.jsonBodyEndPoint,
           p_jsonResponseErrorDefault: values.jsonErrorGeneralEndPoint,
           p_metodoRestApi: values.metodoRest,
-          p_estado: values.statusEndPoint
+          p_estado: values.statusEndPoint,
+          auditoria: `user:${userLogin}, ${ip}`,
         };
 
         fetchAddEndpoint(endPoint).then(rsp => {
@@ -141,38 +143,18 @@ export default function NewApp() {
 
   const handleDeleteEndPoint = (id) => {
     alert('Enpoint eliminado correctamente');
-    fetchDeleteEndPoint(id).then(setActualizaListEndpoints(!actualizaListEndpoints));
+    fetchDeleteEndPoint(id, `user:${userLogin}, ${ip}`).then(setActualizaListEndpoints(!actualizaListEndpoints));
   };
 
   return (
     <div className="w-full h-screen bg-slate-100">
-      <nav className="w-full flex p-4 items-center bg-white">
-        <div className="flex-1 flex gap-8 items-center">
-          <div>
-            <Image
-              src="/Logo_Unicomer_Webversion.jpeg"
-              width={94}
-              height={48}
-              alt=""
-            />
-          </div>
-          <Link href="/dashboard">
-            <a className="text-blue-800 font-semibold">Inicio</a>
-          </Link>
-          <Link href="#">
-            <a className="text-blue-800 font-semibold">Logs</a>
-          </Link>
-        </div>
-        <button className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-700 hover:bg-blue-800">
-          Cerrar sesión
-        </button>
-      </nav>
+      <Narvar />
       <main className="bg-slate-100 pb-20">
         <section className="my-10 p-4 flex flex-col md:flex-row gap-10">
           <form id="form1" onSubmit={formikApp.handleSubmit} className="w-full md:w-2/5 ">
             <div>
               <h1 className="text-gray-900 text-3xl font-extrabold tracking-tight">
-                Datos del app: {codeApp}
+                Datos de la app: {codeApp}
               </h1>
               <h5 className=" text-slate-500 text-sm">
                 Ingresar principales datos del app.
@@ -466,20 +448,20 @@ export default function NewApp() {
           <div className="bg-white p-4 rounded-md">
             <div className="border border-slate-200 rounded-md w-full">
               <div className="bg-slate-200 flex justify-between p-2 font-semibold">
-                <div className="w-full">Código</div>
+                <div className="w-1/4">Código</div>
                 <div className="w-full">Descripción</div>
                 <div className="w-full">Path</div>
-                <div className="w-full">Tipo metodo</div>
-                <div className="w-full">Estado</div>
+                <div className="w-1/3">Tipo metodo</div>
+                <div className="w-1/3">Estado</div>
                 <div className="w-full text-center">Acciones</div>
               </div>
               {
                 endpoints.map(item => <div key={item.id} className="p-2 flex justify-between items-center border-t text-slate-500">
-                <div className="w-full text-sm">{item.id}</div>
+                <div className="w-1/4 text-sm">{item.id}</div>
                 <div className="w-full text-sm"> {item.descripcion} </div>
                 <div className="w-full text-sm"> {item.path} </div>
-                <div className="w-full text-sm"> {item.metodoRestApi} </div>
-                <div className="w-full text-sm">
+                <div className="w-1/3 text-sm"> {item.metodoRestApi} </div>
+                <div className="w-1/3 text-sm">
                 {
                   item.estado == 1 ? (
                     <span className="py-1 px-2 bg-emerald-200 text-emerald-600 rounded-full text-xs">

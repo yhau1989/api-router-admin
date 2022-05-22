@@ -71,7 +71,7 @@ export default function Home() {
           </div>
           <div>
             <label htmlFor="email-address" className="text-white text-sm">
-              Email {ipClient}
+              Email
             </label>
             <input
               className="bg-white w-full text-sm py-2 px-3 rounded-md text-gray-700"
@@ -103,11 +103,6 @@ export default function Home() {
             >
               Ingresar
             </button>
-            {/* <Link href="/dashboard">
-              <a className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-700 hover:bg-blue-800">
-              Ingresar
-              </a>
-            </Link> */}
           </div>
           <div>
             { error.length > 0 && (
@@ -117,6 +112,7 @@ export default function Home() {
         </div>
       </div>
       <div className="w-3/5 bg-blue-900 p-4 hidden sm:flex sm:justify-center sm:items-center">
+       <div className="absolute top-0 right-0 text-white p-2">{ipClient}</div> 
         <img src="unicomer_logo_en.png" alt="" />
       </div>
     </div>

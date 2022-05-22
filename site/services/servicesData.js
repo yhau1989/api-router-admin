@@ -102,9 +102,9 @@ export const fetchLogin = (user, password) => {
       });
   };
 
-  export const fetchDeleteEndPoint = (id) => {
+  export const fetchDeleteEndPoint = (id, audit) => {
     return axios
-      .post(`${URLS.URL_REMOVE_ENDPOINT}?id=${id}`)
+      .post(`${URLS.URL_REMOVE_ENDPOINT}?id=${id}&auditoria=${audit}`)
       .then((response) => {
         return {status: 0, response}
       })

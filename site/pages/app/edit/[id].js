@@ -5,6 +5,7 @@ import Link from "next/link";
 import { fetchEditEndpoint, fetchAddEndpoint, fetchGetAppByCode, fetchGetEndPointsByIdApp, fetchDeleteEndPoint, fetchUpdateApp } from "../../../services/servicesData";
 import { Formik } from "formik";
 import * as Yup from "yup";
+import Cookies from 'universal-cookie';
 
 
 export default function EditApp() {
@@ -33,6 +34,10 @@ export default function EditApp() {
 
   const [actionsEndPoint, setActionsEndPoint] = useState("add");
   const campoRequeridoMsg = "* campo requerido";
+
+  const cookies = new Cookies();
+  const ip = cookies.get("ipClient");
+  const userLogin = cookies.get("userLogin");
 
   useEffect(() => {
     console.log('id', id);
@@ -84,7 +89,7 @@ export default function EditApp() {
 
   
   const handleDeleteEndPoint = (id) => {
-    fetchDeleteEndPoint(id).then(rsp => {
+    fetchDeleteEndPoint(id,`user:${userLogin}, ${ip}`).then(rsp => {
       console.log('rsp: ', rsp);
       if(rsp.status != 0)
       {
@@ -140,6 +145,7 @@ export default function EditApp() {
       p_jsonResponseErrorDefault: jsonErrorGeneralEndPoint,
       p_metodoRestApi: metodoRest,
       p_estado: statusEndPoint,
+      auditoria: `user:${userLogin}, ${ip}`,
     };
 
     fetchAddEndpoint(data).then(rsp => {
@@ -162,6 +168,7 @@ export default function EditApp() {
       p_jsonResponseErrorDefault: jsonErrorGeneralEndPoint,
       p_metodoRestApi: metodoRest,
       p_estado: statusEndPoint,
+      auditoria: `user:${userLogin}, ${ip}`,
     };
 
     fetchEditEndpoint(data).then(rsp => {
@@ -217,7 +224,8 @@ export default function EditApp() {
                 descripcion: values.descApp,
                 codigo: values.codigoApp,
                 dnsIpDestino: values.ipApp,
-                estado: parseInt(values.statusApp)
+                estado: parseInt(values.statusApp),
+                auditoria: `user:${userLogin}, ${ip}`,
               };
 
               fetchUpdateApp(app).then(rsp => {
@@ -249,7 +257,7 @@ export default function EditApp() {
             <div className="w-full md:w-2/5">
               <div>
                 <h1 className="text-gray-900 text-3xl font-extrabold tracking-tight">
-                  Datos del app: {id}
+                  Datos de la app: {id}
                 </h1>
                 <h5 className=" text-slate-500 text-sm">
                   Ingresar principales datos del app.
@@ -552,20 +560,20 @@ export default function EditApp() {
           <div className="bg-white p-4 rounded-md">
             <div className="border border-slate-200 rounded-md w-full">
               <div className="bg-slate-200 flex justify-between p-2 font-semibold">
-                <div className="w-full">Código</div>
+                <div className="w-1/4">Código</div>
                 <div className="w-full">Descripción</div>
                 <div className="w-full">Path</div>
-                <div className="w-full">Tipo metodo</div>
-                <div className="w-full">Estado</div>
+                <div className="w-1/3">Tipo metodo</div>
+                <div className="w-1/3">Estado</div>
                 <div className="w-full text-center">Acciones</div>
               </div>
               {
                 endpoints.map(item => <div key={item.id} className="p-2 flex justify-between items-center border-t text-slate-500">
-                <div className="w-full text-sm">{item.id}</div>
+                <div className="w-1/4 text-sm">{item.id}</div>
                 <div className="w-full text-sm"> {item.descripcion} </div>
                 <div className="w-full text-sm"> {item.path} </div>
-                <div className="w-full text-sm"> {item.metodoRestApi} </div>
-                <div className="w-full text-sm">
+                <div className="w-1/3 text-sm"> {item.metodoRestApi} </div>
+                <div className="w-1/3 text-sm">
                 {
                   item.estado == 1 ? (
                     <span className="py-1 px-2 bg-emerald-200 text-emerald-600 rounded-full text-xs">
