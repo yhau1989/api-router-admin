@@ -1,6 +1,4 @@
 import { useState, useEffect } from "react"
-import Image from "next/image";
-import Link from "next/link";
 import { generateApp } from "../../libs/utils";
 import { fetchAddApp, fetchAddEndpoint, fetchGetAppByCode, fetchGetEndPointsByIdApp, fetchDeleteEndPoint } from "../../services/servicesData";
 import { useFormik } from "formik";
