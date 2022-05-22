@@ -13,7 +13,6 @@ export default function Home() {
   const [ error, setError] = useState('');
   const cookies = new Cookies();
   const [ipClient, setIpClient] = useState(null);
-  // var ip = require('ip');
 
   const login  = () => {
     fetchLogin(email, password).then(rsp => {
@@ -44,7 +43,7 @@ export default function Home() {
   }
 
   useEffect(() => {
-    const getIpClient = () => {
+    const getIpClient = async() => {
       fetchIp().then(rsp => {
         const { status, error, response } = rsp;
         if(status == 0 && response.status == 200)
