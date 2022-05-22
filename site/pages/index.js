@@ -4,6 +4,7 @@ import Cookies from 'universal-cookie';
 import { parseCookies } from "../libs/parseCookies"
 import { useRouter } from 'next/router'
 
+
 export default function Home() {
 
   const router = useRouter();
@@ -12,13 +13,14 @@ export default function Home() {
   const [ error, setError] = useState('');
   const cookies = new Cookies();
   const [ipClient, setIpClient] = useState(null);
+  // var ip = require('ip');
 
   const login  = () => {
     fetchLogin(email, password).then(rsp => {
       const { status, response } = rsp;
       if(status == 0 && response.data.status == 0)
       {
-        cookies.set("userLogin", 'ok', {
+        cookies.set("userLogin", email, {
           path: "/",
           maxAge: 3600, // Expires after 1hr
           sameSite: true,

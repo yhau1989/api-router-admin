@@ -5,6 +5,7 @@ import { generateApp } from "../../libs/utils";
 import { fetchAddApp, fetchAddEndpoint, fetchGetAppByCode, fetchGetEndPointsByIdApp, fetchDeleteEndPoint } from "../../services/servicesData";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import Cookies from 'universal-cookie';
 
 
 export default function NewApp() {
@@ -13,8 +14,10 @@ export default function NewApp() {
   const [idApp, setIdApp] = useState(null);
   const [endpoints, setEndPoints] = useState([]);
   const [actualizaListEndpoints, setActualizaListEndpoints] = useState(false);
-
   const campoRequeridoMsg = "* campo requerido";
+  const cookies = new Cookies();
+  const ip = cookies.get("ipClient");
+  const userLogin = cookies.get("userLogin");
 
   const formikApp = useFormik({
     initialValues: {
@@ -37,7 +40,8 @@ export default function NewApp() {
         nombre: values.nameApp,
         descripcion: values.descApp,
         codigo: values.codigoApp,
-        dnsIpDestino: values.ipApp
+        dnsIpDestino: values.ipApp,
+        auditoria: `user:${userLogin}, ${ip}`,
       };
 
       fetchAddApp(app).then(rsp => {
