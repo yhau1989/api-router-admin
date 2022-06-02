@@ -215,8 +215,8 @@ systemctl status nginx
  firewall-cmd --list-ports
 ```
 
-## Comprobar el aplicativo desde otra proyecto
-- Abrir la ruta de la ip del server: http://10.131.100.106/
+## Comprobar el aplicativo desde otro equipo
+- Abrir la ruta de la ip del server: http://10.131.100.106/ en el navegador.
 
 ## Referencias
 
