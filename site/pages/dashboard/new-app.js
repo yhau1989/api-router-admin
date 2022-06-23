@@ -80,7 +80,7 @@ export default function NewApp() {
       pathEndPoint: Yup.string()
         .required(campoRequeridoMsg),
     }),
-    onSubmit: (values) => {
+    onSubmit: (values, { resetForm }) => {
       if(idApp?.id)
       {
         const endPoint = {
@@ -100,6 +100,7 @@ export default function NewApp() {
            if(status == 200 && data.status == 0){
               alert('Enpoint agregado con correctamente')
               setActualizaListEndpoints(!actualizaListEndpoints);
+              resetForm();
            } else {
               alert(data.msg)
            }
@@ -140,8 +141,12 @@ export default function NewApp() {
   },[actualizaListEndpoints]);
 
   const handleDeleteEndPoint = (id) => {
-    alert('Enpoint eliminado correctamente');
-    fetchDeleteEndPoint(id, `user:${userLogin}, ${ip}`).then(setActualizaListEndpoints(!actualizaListEndpoints));
+    var answer = window.confirm("Esta seguro de eliminar?");
+    if(answer)
+    {
+      alert('Enpoint eliminado correctamente');
+      fetchDeleteEndPoint(id, `user:${userLogin}, ${ip}`).then(setActualizaListEndpoints(!actualizaListEndpoints));
+    }
   };
 
   return (

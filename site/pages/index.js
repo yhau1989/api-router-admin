@@ -14,7 +14,8 @@ export default function Home() {
   const cookies = new Cookies();
   const [ipClient, setIpClient] = useState(null);
 
-  const login  = () => {
+  const login  = event => {
+    event.preventDefault();
     fetchLogin(email, password).then(rsp => {
       const { status, response } = rsp;
       if(status == 0 && response.data.status == 0)
@@ -36,7 +37,8 @@ export default function Home() {
       else
       {
         console.log('samo: ', rsp);
-        setError(response.data.msg);
+        // setError(response.data.msg);
+        setError('usuario o contraseña incorrectos');
       }
 
     })
@@ -65,7 +67,9 @@ export default function Home() {
     <div className="w-full h-screen flex">
       
       <div className="w-full sm:w-2/5 flex justify-center items-center bg-blue-500 py-4 px-10 sm:px-15">
-        <div className="w-full flex flex-col gap-6">
+        <form
+          onSubmit={login}
+          className="w-full flex flex-col gap-6">
           <div className="sm:hidden flex justify-center items-center p-10">
             <img src="unicomer_logo_en.png" alt="logo-unicomer" className="w-1/2" />
           </div>
@@ -98,8 +102,9 @@ export default function Home() {
             />
           </div>
           <div>
-            <button className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-700 hover:bg-blue-800"
-              onClick={() => login()}
+            <button 
+              type='submit'
+              className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-700 hover:bg-blue-800"
             >
               Ingresar
             </button>
@@ -109,7 +114,7 @@ export default function Home() {
               <div className="text-sm text-white">{error}</div>
             )}
           </div>
-        </div>
+        </form>
       </div>
       <div className="w-3/5 bg-blue-900 p-4 hidden sm:flex sm:justify-center sm:items-center">
        <div className="absolute top-0 right-0 text-white p-2">{ipClient}</div> 

@@ -89,18 +89,21 @@ export default function EditApp() {
 
   
   const handleDeleteEndPoint = (id) => {
-    fetchDeleteEndPoint(id,`user:${userLogin}, ${ip}`).then(rsp => {
-      console.log('rsp: ', rsp);
-      if(rsp.status != 0)
-      {
-        alert(rsp.error.message);
-      }
-      else
-      {
-        alert('Enpoint eliminado correctamente');
-        setActualizaListEndpoints(!actualizaListEndpoints)
-      }
-    });
+    var answer = window.confirm("Esta seguro de eliminar?");
+    if(answer){
+      fetchDeleteEndPoint(id,`user:${userLogin}, ${ip}`).then(rsp => {
+        console.log('rsp: ', rsp);
+        if(rsp.status != 0)
+        {
+          alert(rsp.error.message);
+        }
+        else
+        {
+          alert('Enpoint eliminado correctamente');
+          setActualizaListEndpoints(!actualizaListEndpoints)
+        }
+      });
+    }
   };
 
   const handleEdit = (data) => {
@@ -152,6 +155,12 @@ export default function EditApp() {
        const { data, status } = rsp.response;
        if(status == 200 && data.status == 0){
           alert('Enpoint agregado con correctamente')
+          setPathEndPoint("");
+          setDescEndPoint("");
+          setJsonBodyEndPoint("");
+          setJsonErrorGeneralEndPoint("");
+          setMetodoRest("POST");
+          setStatusEndPoint("1");
           setActualizaListEndpoints(!actualizaListEndpoints);
        } else {
           alert(data.msg)
@@ -171,15 +180,18 @@ export default function EditApp() {
       auditoria: `user:${userLogin}, ${ip}`,
     };
 
-    fetchEditEndpoint(data).then(rsp => {
-       const { data, status } = rsp.response;
-       if(status == 200 && data.status == 0){
-          alert('Enpoint editado con correctamente')
-          setActualizaListEndpoints(!actualizaListEndpoints);
-       } else {
-          alert(data.msg)
-       }
-    });
+    let answer = window.confirm("Estas seguro de editar?")
+    if(answer){
+      fetchEditEndpoint(data).then(rsp => {
+         const { data, status } = rsp.response;
+         if(status == 200 && data.status == 0){
+            alert('Enpoint editado con correctamente')
+            setActualizaListEndpoints(!actualizaListEndpoints);
+         } else {
+            alert(data.msg)
+         }
+      });
+    }
   }
 
   return (
@@ -228,29 +240,33 @@ export default function EditApp() {
                 auditoria: `user:${userLogin}, ${ip}`,
               };
 
-              fetchUpdateApp(app).then(rsp => {
-                console.log('add edit: ',  app);
-                const { data, status } = rsp.response;
-                if(status == 200 && data.status == 0){
-                    alert('App editada correctamente')
-                    setInitVal({
-                    nameApp: app.nombre,
-                    descApp: app.descripcion,
-                    ipApp: app.dnsIpDestino,
-                    statusApp: app.estado.toString(),
-                    codigoApp: app.codigo,
-                  })
-                  setApp({
-                    nameApp: app.nombre,
-                    descApp: app.descripcion,
-                    ipApp: app.dnsIpDestino,
-                    statusApp: app.estado.toString(),
-                    codigoApp: app.codigo,
-                  });
-                } else {
-                    alert(data.msg)
-                }
-              });
+              let answer = window.confirm("Estas seguro de editar?");
+              if(answer)
+              {
+                fetchUpdateApp(app).then(rsp => {
+                  // console.log('add edit: ',  app);
+                  const { data, status } = rsp.response;
+                  if(status == 200 && data.status == 0){
+                      alert('App editada correctamente')
+                      setInitVal({
+                      nameApp: app.nombre,
+                      descApp: app.descripcion,
+                      ipApp: app.dnsIpDestino,
+                      statusApp: app.estado.toString(),
+                      codigoApp: app.codigo,
+                    })
+                    setApp({
+                      nameApp: app.nombre,
+                      descApp: app.descripcion,
+                      ipApp: app.dnsIpDestino,
+                      statusApp: app.estado.toString(),
+                      codigoApp: app.codigo,
+                    });
+                  } else {
+                      alert(data.msg)
+                  }
+                });
+              }
             }}
           >
           {({handleBlur, handleChange, handleSubmit, values, errors, touched }) => (
@@ -369,7 +385,7 @@ export default function EditApp() {
                   <button className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-700 hover:bg-blue-800"
                   onClick={() => handleSubmit()}
                   >
-                    Guardar
+                    Grabar
                   </button>
                 </div>
               </div>
@@ -530,7 +546,7 @@ export default function EditApp() {
                       <button className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-700 hover:bg-blue-800"
                       onClick={() => handleSubmitEndPoint()}
                       >
-                       {actionsEndPoint == "edit" ? "Editar" : "Agregar"} 
+                       {actionsEndPoint == "edit" ? "Grabar" : "Agregar"} 
                       </button>
                     </div>
                     <div>
