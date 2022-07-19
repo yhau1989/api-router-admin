@@ -8,6 +8,10 @@ import * as Yup from "yup";
 import Cookies from 'universal-cookie';
 
 
+
+/**
+ * Pantalla para editar un app existente
+ */
 export default function EditApp() {
 
   const router = useRouter();

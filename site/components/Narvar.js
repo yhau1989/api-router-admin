@@ -4,6 +4,9 @@ import Cookies from 'universal-cookie';
 import { useRouter } from 'next/router'
 
 
+/**
+ * Componente del menu superior
+ */
 export default function Narvar() {
   
   const router = useRouter();

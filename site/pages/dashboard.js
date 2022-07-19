@@ -6,6 +6,10 @@ import Cookies from 'universal-cookie';
 var Promise = require('promise');
 import Narvar from '../components/Narvar'
 
+
+/**
+ * Pantalla del Dashboard
+ */
 export default function Dashboard() {
 
   const router = useRouter();

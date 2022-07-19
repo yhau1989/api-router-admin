@@ -7,6 +7,10 @@ import Cookies from 'universal-cookie';
 import Narvar from '../../components/Narvar'
 
 
+
+/**
+ * Pantalla para agregar nuevo app
+ */
 export default function NewApp() {
 
   const [codeApp] = useState(generateApp());

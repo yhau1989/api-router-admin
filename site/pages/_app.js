@@ -1,5 +1,9 @@
 import '../styles/globals.css'
 
+
+/**
+ * Punto de entrada del app
+ */
 function MyApp({
   Component,
   pageProps

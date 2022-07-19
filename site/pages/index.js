@@ -4,7 +4,9 @@ import Cookies from 'universal-cookie';
 import { parseCookies } from "../libs/parseCookies"
 import { useRouter } from 'next/router'
 
-
+/**
+ * Pantalla de login
+ */
 export default function Home() {
 
   const router = useRouter();
