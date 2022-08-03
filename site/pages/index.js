@@ -40,7 +40,12 @@ export default function Home() {
       {
         console.log('samo: ', rsp);
         // setError(response.data.msg);
-        setError('usuario o contraseña incorrectos');
+        if(rsp.error?.code == "ERR_NETWORK")
+        {
+          setError('Existen problemas en la red, o el servidor remoto no responde');
+        } else {
+          setError('usuario o contraseña incorrectos');
+        }
       }
 
     })
